@@ -4,7 +4,8 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
-var guestRouter = require('./routes/guest_controller');
+var hostRouter = require('./routes/host_router');
+var organizerRouter = require('./routes/organizer_router');
 var {sequelize} = require("./db/sequelizer")
 var {setRelations} = require("./db/relations")
 
@@ -21,7 +22,9 @@ sequelize.sync().then(_ => {
     app.use(express.static(path.join(__dirname, 'public')));
 
     app.use('/', indexRouter);
-    app.use('/users', guestRouter);
+    app.use('/organizer', organizerRouter);
+    app.use('/meeting', meetingRouter);
+    app.use('/host', hostRouter);
 })
 
 module.exports = app;
