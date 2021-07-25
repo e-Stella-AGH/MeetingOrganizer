@@ -1,13 +1,17 @@
 const {Organizer} = require('../db/organizer')
 var express = require('express');
 var router = express.Router();
+const {meetingService} = require('../services/meeting_service')
 
-router.get('/<UUID_meeting>', function(req, res, next) {
-  res.send("Timeslots from hosts");  
+//TOMEK
+router.get('/:uuid', function(req, res, next) {
+  res.send(meetingService.getTimeSlotsIntersection(req.params['uuid']));
 });
-router.put('/<UUID_meeting>/pick_time_slot', function(req, res, next) {
+router.put('/:uuid/pick_time_slot', function(req, res, next) {
   res.send("choose timeslot");  
 });
+
+//RADEK
 router.post('/', function(req, res, next) {
   res.send("create meeting");  
 });

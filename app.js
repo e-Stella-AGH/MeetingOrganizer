@@ -6,6 +6,7 @@ var logger = require('morgan');
 var indexRouter = require('./routes/index');
 var hostRouter = require('./routes/host_router');
 var organizerRouter = require('./routes/organizer_router');
+var meetingRouter = require('./routes/meeting_router')
 var {sequelize} = require("./db/sequelizer")
 var {setRelations} = require("./db/relations")
 
