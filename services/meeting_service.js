@@ -15,7 +15,7 @@ const findOrCreateHosts = async(emails) => {
     return hostsArray.map( hostArray => hostArray[0])
 }
 
-const isNewHosts = async (meeting,hostsMails) => {
+const areNewHosts = async (meeting,hostsMails) => {
     const meetingHosts = await meeting.getHosts();
     const meetingMails = meetingHosts.map(host => host.emial)
     return JSON.stringify(meetingMails) === JSON.stringify(hostsMails)
@@ -27,7 +27,7 @@ const isNewGuest = async (meeting,guestMail) => {
 }
 
 const updateMeetingHosts = async(meeting,hostsMails) => {
-    if(await isNewHosts(meeting,hostsMails))return;
+    if(await areNewHosts(meeting,hostsMails))return;
     const hosts = await findOrCreateHosts(hostsMails)
     await meeting.setHosts(hosts)
 }
