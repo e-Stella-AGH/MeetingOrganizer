@@ -12,7 +12,6 @@ router.put('/<UUID_meeting>/pick_time_slot', function(req, res, next) {
 
 router.post('/', function(req, res, next) {
   const parsed = req.body
-  console.log(parsed)
   meetingService
     .createMeeting(parsed.uuid,parsed.hosts,parsed.guest,parsed.duration)
     .then(result => res.status(result.status).send(result))  
