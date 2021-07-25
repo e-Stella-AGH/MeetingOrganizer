@@ -6,16 +6,17 @@ var logger = require('morgan');
 var indexRouter = require('./routes/index');
 var hostRouter = require('./routes/host_router');
 var organizerRouter = require('./routes/organizer_router');
+var meetingRouter = require('./routes/meeting_router');
 var {sequelize} = require("./db/sequelizer")
-var {setRelations} = require("./db/relations")
+var {models} = require("./db/relations")
 
 var app = express();
 
-setRelations()
+const model = models
 sequelize.sync().then(_ => {
 
 
-    app.use(logger('dev'));
+    app.use(logger('prod'));
     app.use(express.json());
     app.use(express.urlencoded({ extended: false }));
     app.use(cookieParser());

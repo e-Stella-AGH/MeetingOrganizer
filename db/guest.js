@@ -3,12 +3,7 @@ const {DataTypes } = require("sequelize");
 
 
 const Guest = sequelize.define("Guests", {
-    id: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
-        primaryKey: true    
-    },
-    email: {type: DataTypes.STRING, allowNull: false}
+    email: {type: DataTypes.STRING, primaryKey: true}
 }, { timestamps: false })
 
 exports.Guest = Guest

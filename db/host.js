@@ -7,7 +7,7 @@ const Host = sequelize.define("Host", {
         defaultValue: Sequelize.UUIDV4,
         primaryKey: true    
     },
-    email: {type: DataTypes.STRING, allowNull: false}
+    email: {type: DataTypes.STRING, allowNull: false, unique: true}
 })
 
 exports.Host = Host
