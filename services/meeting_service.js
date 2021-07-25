@@ -4,6 +4,8 @@ const Meeting = models.Meeting
 const Guest = models.Guest
 const Host = models.Host
 
+const BAD_REQUEST_CODE = 400
+
 const findOrCreateGuest = async(email) => {
     const guest = await Guest.findOrCreate({where:{email: email}})
     return guest[0];
@@ -39,7 +41,7 @@ const updateMeetingGuest = async (meeting,guestMail) => {
 }
 
 const updateMeetingDuration = async(meeting, duration) => 
-    {if(meeting.duration!==duration) await meeting.update({duration: duration}, {where: {uuid: uuid}})}
+    {if(meeting.duration!==duration) await meeting.update({duration: duration}, {where: {uuid: meeting.uuid}})}
 
 const createResponse = (msg, status = 200) => {return {
         msg: msg,
@@ -48,10 +50,6 @@ const createResponse = (msg, status = 200) => {return {
 }
 
 const meetingService = {
-
-    getMeeting: async() => {
-        return await Meeting.findAll()
-    },
 
     createMeeting: async (uuid,hostsMails, guestMail, duration) => {
         var checkData, meeting
@@ -62,7 +60,7 @@ const meetingService = {
             checkData = Checker.checkDataWithUUID(uuid,hostsMails,guestMail,duration)
             meeting = await Meeting.create({uuid:uuid, duration: duration})
         }
-        if(checkData!==true) return createResponse(checkData, 404)
+        if(checkData!==true) return createResponse(checkData, BAD_REQUEST_CODE)
         const guest = await findOrCreateGuest(guestMail)
         const hosts = await findOrCreateHosts(hostsMails)
         await meeting.setGuest(guest)
@@ -74,8 +72,8 @@ const meetingService = {
     updateMeeting: async (uuid, hostsMails, guestMail, duration) => {
         const meeting = await Meeting.findByPk(uuid)
         const checkData = Checker.checkDataWithUUID(uuid,hostsMails,guestMail,duration)
-        if(checkData!==true) return createResponse(checkData, 404)
-        if(meeting.startTime!==null) return createResponse("You can't update scheduled meeting",404)
+        if(checkData!==true) return createResponse(checkData, BAD_REQUEST_CODE)
+        if(meeting.startTime!==null) return createResponse("You can't update scheduled meeting",BAD_REQUEST_CODE)
         await updateMeetingHosts(meeting,hostsMails)
         await updateMeetingGuest(meeting,guestMail)
         await updateMeetingDuration(meeting,duration)
