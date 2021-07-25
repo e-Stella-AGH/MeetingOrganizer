@@ -118,7 +118,7 @@ describe("Test the PUT meeting", () => {
           const guest = data[0];
           expect(guest.email).toBe(updatedBody.guest)
           const hostsMails = data[1].map(host => host.email)
-          expect(JSON.stringify(hostsMails)).toBe(JSON.stringify(updatedBody.hosts))
+          expect(JSON.stringify(hostsMails.sort())).toBe(JSON.stringify(updatedBody.hosts.sort()))
           done()
         })
     })
