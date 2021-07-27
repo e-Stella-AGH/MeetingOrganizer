@@ -8,7 +8,7 @@ const Meeting = sequelize.define("Meeting", {
         primaryKey: true
     },
     duration: {type: DataTypes.INTEGER, allowNull: false},
-    starTime: {type: DataTypes.DATE},
+    startTime: {type: DataTypes.DATE},
 })
 
 exports.Meeting = Meeting

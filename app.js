@@ -1,21 +1,22 @@
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
 
-var indexRouter = require('./routes/index');
-var hostRouter = require('./routes/host_router');
-var organizerRouter = require('./routes/organizer_router');
-var {sequelize} = require("./db/sequelizer")
-var {setRelations} = require("./db/relations")
+const indexRouter = require('./routes/index');
+const hostRouter = require('./routes/host_router');
+const organizerRouter = require('./routes/organizer_router');
+const meetingRouter = require('./routes/meeting_router');
+const {sequelize} = require("./db/sequelizer")
+const {models} = require("./db/relations")
 
-var app = express();
+const app = express();
 
-setRelations()
+const model = models
 sequelize.sync().then(_ => {
 
 
-    app.use(logger('dev'));
+    app.use(logger('prod'));
     app.use(express.json());
     app.use(express.urlencoded({ extended: false }));
     app.use(cookieParser());
