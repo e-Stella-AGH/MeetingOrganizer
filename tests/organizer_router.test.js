@@ -17,13 +17,19 @@ describe("Test the register user", () => {
         await sequelize.sync()
     })
 
-    test("It should register new user", done => {
+    test("It should register new user and with second try respond that email is already used", done => {
         request(app).post("/organizer/register")
             .send(body)
             .then(response => {
                 expect(response.statusCode).toBe(201)
                 expect(response.body.msg).toBe("Created user")
-                done()
+                request(app).post("/organizer/register")
+                .send(body)
+                .then(response => {
+                    expect(response.statusCode).toBe(400)
+                    expect(response.body.msg).toBe("This mail is already used")
+                    done()
+                })
             })
     })
 
@@ -37,15 +43,6 @@ describe("Test the register user", () => {
             })
     })
 
-    test("It should response that this mail is already used", done => {
-        request(app).post("/organizer/register")
-            .send(body)
-            .then(response => {
-                expect(response.statusCode).toBe(400)
-                expect(response.body.msg).toBe("This mail is already used")
-                done()
-            })
-    })
 })
 
 
