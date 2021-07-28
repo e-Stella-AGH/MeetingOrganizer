@@ -11,12 +11,7 @@ const Checker = {
 
     checkDataWithUUID: (uuid,hostsMails,guestMail,duration) => {
         if(!checkUUID(uuid))return "Not proper UUID"
-        if(!checkMail(guestMail))return "Guest mail is not valid mail"
-        if(hostsMails.length===0)return "In the meeting there must be hosts"
-        const hosts = hostsMails.filter(mail => !checkMail(mail))
-        if(hosts.length!==0)return "These are not valid mails: " + hosts.join(" ")
-        if(!Number.isInteger(duration))return "Duration is not proper integer"
-        return true
+        return Checker.checkData(hostsMails,guestMail,duration)
     },
 
     checkData: (hostsMails,guestMail,duration) => {
@@ -25,6 +20,11 @@ const Checker = {
         const hosts = hostsMails.filter(mail => !checkMail(mail))
         if(hosts.length!==0)return "These are not valid mails: " + hosts.join(" ")
         if(!Number.isInteger(duration))return "Duration is not proper integer"
+        return true
+    },
+
+    checkEmail: (email) => {
+        if(!checkMail(email)) return "Not valid email"
         return true
     }
 
