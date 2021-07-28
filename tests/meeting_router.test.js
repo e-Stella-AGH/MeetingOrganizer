@@ -1,6 +1,6 @@
 const request = require("supertest");
 const db = require("../db/relations")
-const { sequelize } = require("../db/sequelizer")
+const {sequelize} = require("../db/sequelizer")
 const app = require("../app");
 const { Utils } = require("./test_utils")
 

@@ -8,6 +8,8 @@ const createResponse = Responses.createResponse
 
 const BAD_REQUEST_CODE = 400
 
+const BAD_REQUEST_CODE = 400
+
 const findOrCreateGuest = async(email) => {
     const guest = await Guest.findOrCreate({where:{email: email}})
     return guest[0];
