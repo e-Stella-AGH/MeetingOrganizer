@@ -3,6 +3,7 @@ const { Checker } = require('./data_checker')
 const { Authorize } = require('./jwt_service')
 const Organizer = models.Organizer
 const { Responses } = require('../utils/responses')
+const { Meeting } = require('../db/meeting')
 const createResponse = Responses.createResponse
 
 const invalidResponse = createResponse("Invalid login or password", 400)
@@ -13,9 +14,9 @@ const organizerService = {
     register: async (email, password) => {
         const checkResult = Checker.checkEmail(email) 
         if(checkResult!==true)return createResponse(checkResult,400)
-        const newPassword = await Authorize.hashPassword(password)
         const organizers = await findOrganizerWithEmail(email)
         if(organizers.length!==0) return createResponse("This mail is already used",400) 
+        const newPassword = await Authorize.hashPassword(password)
         await Organizer.create({ email: email, password: newPassword })
         return createResponse("Created user",201)
     },
@@ -31,10 +32,12 @@ const organizerService = {
 
     updateOrganizer: async(organizer,password) => {
         const hashedPassword = await Authorize.hashPassword(password)
-        
+        organizer.password = hashedPassword
+        await organizer.save()
+        return createResponse("User updated")
     },
 
     getById: async (id) => await Organizer.findByPk(id)
 }
 
-exports.organizerService = organizerService
+exports.OrganizerService = organizerService

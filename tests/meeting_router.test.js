@@ -27,7 +27,7 @@ describe("Test the POST meeting", () => {
     request(app).post("/meeting").set(header, jwt)
       .send({ ...body, guest: "aa.pl" })
       .then(response => {
-        expect(response.statusCode).toBe(404)
+        expect(response.statusCode).toBe(BAD_REQUEST_CODE)
         expect(response.body.msg).toBe("Guest mail is not valid mail")
         done()
       })
@@ -37,8 +37,8 @@ describe("Test the POST meeting", () => {
     request(app).post("/meeting").set(header, jwt)
       .send({ ...body, hosts: [] })
       .then(response => {
-        expect(response.statusCode).toBe(404)
-        expect(response.body.msg).toBe("In the meeting there must be hosts")
+        expect(response.statusCode).toBe(BAD_REQUEST_CODE)
+        expect(response.body.msg).toBe("There must be at least one host in the meeting")
         done()
       })
   })
@@ -47,7 +47,7 @@ describe("Test the POST meeting", () => {
     request(app).post("/meeting").set(header, jwt)
       .send({ ...body, hosts: ["aba@aba.pl", "cccccc.pl"] })
       .then(response => {
-        expect(response.statusCode).toBe(404)
+        expect(response.statusCode).toBe(BAD_REQUEST_CODE)
         expect(response.body.msg).toBe("These are not valid mails: cccccc.pl")
         done()
       })
@@ -56,7 +56,7 @@ describe("Test the POST meeting", () => {
     request(app).post("/meeting").set(header, jwt)
       .send({ ...body, duration: "ala" })
       .then(response => {
-        expect(response.statusCode).toBe(404)
+        expect(response.statusCode).toBe(BAD_REQUEST_CODE)
         expect(response.body.msg).toBe("Duration is not proper integer")
         done()
       })
@@ -65,7 +65,7 @@ describe("Test the POST meeting", () => {
     request(app).post("/meeting").set(header, jwt)
       .send({ ...body, uuid: "alazzascxzcx" })
       .then(response => {
-        expect(response.statusCode).toBe(404)
+        expect(response.statusCode).toBe(BAD_REQUEST_CODE)
         expect(response.body.msg).toBe("Not proper UUID")
         done()
       })
@@ -107,13 +107,22 @@ describe("Test the PUT meeting", () => {
 
   test("It should response the correct PUT", done => {
     request(app).put("/meeting/" + uuid).set(header, jwt)
-      .send(body)
+      .send(updatedBody)
       .then(response => {
         expect(response.statusCode).toBe(200)
         expect(response.body.msg).toBe("Meeting updated")
-        db.models.Meeting.findByPk(uuid).then(meeting => {
-          done()
-        })
+        return db.models.Meeting.findByPk(uuid)
+      })
+      .then(meeting => {
+        expect(meeting.duration).toBe(updatedBody.duration)
+        return Promise.all([meeting.getGuest(), meeting.getHosts()])
+      })
+      .then(data => {
+        const guest = data[0];
+        expect(guest.email).toBe(updatedBody.guest)
+        const hostsMails = data[1].map(host => host.email)
+        expect(JSON.stringify(hostsMails.sort())).toBe(JSON.stringify(updatedBody.hosts.sort()))
+        done()
       })
   })
 
@@ -122,7 +131,7 @@ describe("Test the PUT meeting", () => {
 
       .send({ ...body, "guest": "aa.pl" })
       .then(response => {
-        expect(response.statusCode).toBe(404)
+        expect(response.statusCode).toBe(BAD_REQUEST_CODE)
         expect(response.body.msg).toBe("Guest mail is not valid mail")
         done()
       })
@@ -132,8 +141,8 @@ describe("Test the PUT meeting", () => {
     request(app).put("/meeting/" + uuid).set(header, jwt)
       .send({ ...body, "hosts": [] })
       .then(response => {
-        expect(response.statusCode).toBe(404)
-        expect(response.body.msg).toBe("In the meeting there must be hosts")
+        expect(response.statusCode).toBe(BAD_REQUEST_CODE)
+        expect(response.body.msg).toBe("There must be at least one host in the meeting")
         done()
       })
   })
@@ -142,7 +151,7 @@ describe("Test the PUT meeting", () => {
     request(app).put("/meeting/" + uuid).set(header, jwt)
       .send({ ...body, "hosts": ["aba@aba.pl", "cccccc.pl"] })
       .then(response => {
-        expect(response.statusCode).toBe(404)
+        expect(response.statusCode).toBe(BAD_REQUEST_CODE)
         expect(response.body.msg).toBe("These are not valid mails: cccccc.pl")
         done()
       })
@@ -151,7 +160,7 @@ describe("Test the PUT meeting", () => {
     request(app).put("/meeting/" + uuid).set(header, jwt)
       .send({ ...body, "duration": "ala" })
       .then(response => {
-        expect(response.statusCode).toBe(404)
+        expect(response.statusCode).toBe(BAD_REQUEST_CODE)
         expect(response.body.msg).toBe("Duration is not proper integer")
         done()
       })
@@ -236,10 +245,15 @@ describe("Test the DELETE meeting", () => {
 })
 
 
-let body = {
+const body = {
   "duration": 15,
   "hosts": ["aba@aba.pl", "ccc@ccc.pl"],
   "guest": "a@a.pl"
+}
+const updatedBody = {
+  "duration": 30,
+  "hosts": ["aa@aa.pl", "bbb@bbb.pl"],
+  "guest": "b@b.pl"
 }
 
 const uuid = "ad18668e-4a28-4565-9f4a-4eace3068a62"
@@ -256,3 +270,5 @@ let bodyLogin2 = {
   "email": "meeting2@meeting2.pl",
   "password": "test"
 }
+
+const BAD_REQUEST_CODE = 400

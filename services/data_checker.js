@@ -16,7 +16,7 @@ const Checker = {
 
     checkData: (hostsMails,guestMail,duration) => {
         if(!checkMail(guestMail))return "Guest mail is not valid mail"
-        if(hostsMails.length===0)return "In the meeting there must be hosts"
+        if(hostsMails.length===0)return "There must be at least one host in the meeting"
         const hosts = hostsMails.filter(mail => !checkMail(mail))
         if(hosts.length!==0)return "These are not valid mails: " + hosts.join(" ")
         if(!Number.isInteger(duration))return "Duration is not proper integer"

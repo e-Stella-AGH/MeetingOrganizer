@@ -6,8 +6,10 @@ const Host = models.Host
 const { Responses } = require('../utils/responses')
 const createResponse = Responses.createResponse
 
-const findOrCreateGuest = async (email) => {
-    const guest = await Guest.findOrCreate({ where: { email: email } })
+const BAD_REQUEST_CODE = 400
+
+const findOrCreateGuest = async(email) => {
+    const guest = await Guest.findOrCreate({where:{email: email}})
     return guest[0];
 }
 
@@ -17,7 +19,7 @@ const findOrCreateHosts = async (emails) => {
     return hostsArray.map(hostArray => hostArray[0])
 }
 
-const isNewHosts = async (meeting, hostsMails) => {
+const areNewHosts = async (meeting,hostsMails) => {
     const meetingHosts = await meeting.getHosts();
     const meetingMails = meetingHosts.map(host => host.emial)
     return JSON.stringify(meetingMails) === JSON.stringify(hostsMails)
@@ -28,8 +30,8 @@ const isNewGuest = async (meeting, guestMail) => {
     return guest.email === guestMail
 }
 
-const updateMeetingHosts = async (meeting, hostsMails) => {
-    if (await isNewHosts(meeting, hostsMails)) return;
+const updateMeetingHosts = async(meeting,hostsMails) => {
+    if(await areNewHosts(meeting,hostsMails))return;
     const hosts = await findOrCreateHosts(hostsMails)
     await meeting.setHosts(hosts)
 }
@@ -48,20 +50,14 @@ const addHosts = async (meeting, hostsMails) => {
     const hosts = await findOrCreateHosts(hostsMails)
     await meeting.setHosts(hosts)
 }
-
-const updateMeetingDuration = async (meeting, duration) => { 
-    if (meeting.duration !== duration) await meeting.update({ duration: duration }, { where: { uuid: uuid } }) 
-}
+const updateMeetingDuration = async(meeting, duration) => 
+    {if(meeting.duration!==duration) await meeting.update({duration: duration}, {where: {uuid: meeting.uuid}})}
 
 const meetingService = {
 
-    getMeeting: async () => {
-        return await Meeting.findAll()
-    },
-
     createMeeting: async (uuid, hostsMails, guestMail, duration, creator) => {
         const checkData = uuid === undefined ? Checker.checkData(hostsMails, guestMail, duration) : Checker.checkDataWithUUID(uuid, hostsMails, guestMail, duration)
-        if (checkData !== true) return createResponse(checkData, 404)
+        if (checkData !== true) return createResponse(checkData, BAD_REQUEST_CODE)
         const data = uuid === undefined ? { duration: duration } : { uuid: uuid, duration: duration }
         const meeting = await Meeting.create(data)
         await addGuest(meeting,guestMail)
@@ -73,10 +69,10 @@ const meetingService = {
 
     updateMeeting: async (meeting, hostsMails, guestMail, duration) => {
         const checkData = Checker.checkData(hostsMails, guestMail, duration)
-        if (checkData !== true) return createResponse(checkData, 404)
+        if (checkData !== true) return createResponse(checkData, BAD_REQUEST_CODE)
         console.log(meeting)
         console.log(meeting.startTime)
-        if (meeting.startTime !== null) return createResponse("You can't update scheduled meeting", 404)
+        if (meeting.startTime !== null) return createResponse("You can't update scheduled meeting", BAD_REQUEST_CODE)
         await updateMeetingHosts(meeting, hostsMails)
         await updateMeetingGuest(meeting, guestMail)
         await updateMeetingDuration(meeting, duration)
