@@ -21,6 +21,11 @@ const Checker = {
         if(hosts.length!==0)return "These are not valid mails: " + hosts.join(" ")
         if(!Number.isInteger(duration))return "Duration is not proper integer"
         return true
+    },
+
+    checkEmail: (email) => {
+        if(!checkMail(email)) return "Not valid email"
+        return true
     }
 
 }

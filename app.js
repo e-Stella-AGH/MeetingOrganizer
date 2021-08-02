@@ -16,7 +16,7 @@ const model = models
 sequelize.sync().then(_ => {
 
 
-    app.use(logger('prod'));
+    app.use(logger('dev'));
     app.use(express.json());
     app.use(express.urlencoded({ extended: false }));
     app.use(cookieParser());
