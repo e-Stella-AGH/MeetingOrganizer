@@ -21,8 +21,12 @@ const Checker = {
         if(hosts.length!==0)return "These are not valid mails: " + hosts.join(" ")
         if(!Number.isInteger(duration))return "Duration is not proper integer"
         return true
-    }
+    },
 
+    checkTimeSlot: (timeSlot) => {
+        if (new Date(timeSlot.startDatetime).getTime() < Date.now()) return "Time slot cannot start in the past!"
+        return true
+    }
 }
 
 exports.Checker = Checker

@@ -15,6 +15,37 @@ const updatedBody = {
     "guest": "b@b.pl"
 }
 
+const pickedTimeSlot = {
+    "startTime": new Date(2021, 5, 25, 14,30),
+    "duration": 30
+}
+
+const firstTimeSlots = [
+    {
+        startDatetime: new Date(2021, 5, 23, 11),
+        duration: 120
+    },
+    {
+        startDatetime: new Date(2021, 5, 23, 14),
+        duration: 60
+    },
+    {
+        startDatetime: new Date(2021, 5, 25, 12),
+        duration: 300
+    }
+]
+
+const secondTimeSlots = [
+    {
+        startDatetime: new Date(2021, 5, 23, 12),
+        duration: 240
+    },
+    {
+        startDatetime: new Date(2021, 5, 25, 13),
+        duration: 120
+    }
+]
+
 const uuid = "ad18668e-4a28-4565-9f4a-4eace3068a62"
 
 const BAD_REQUEST_CODE = 400
@@ -26,7 +57,7 @@ describe("Test the POST meeting", () => {
         await sequelize.sync()
       })
     
-    test("It should respone that the meeting was added", done => {
+    test("It should respond that the meeting was added", done => {
       request(app).post("/meeting")
         .send(body)
         .then(response => {
@@ -36,7 +67,7 @@ describe("Test the POST meeting", () => {
         })
     })
     
-    test("It should response that guest mail is incorrect", done => {
+    test("It should respond that guest mail is incorrect", done => {
       request(app).post("/meeting")
         .send({...body, guest: "aa.pl"})
         .then(response => {
@@ -46,7 +77,7 @@ describe("Test the POST meeting", () => {
         })
     })
 
-    test("It should response that there are no hosts", done => {
+    test("It should respond that there are no hosts", done => {
       request(app).post("/meeting")
         
         .send({...body, hosts: []})
@@ -57,7 +88,7 @@ describe("Test the POST meeting", () => {
         })
     })
 
-    test("It should response that the hosts mail is incorrect", done => {
+    test("It should respond that the hosts mail is incorrect", done => {
       request(app).post("/meeting")
         .send({...body, hosts: ["aba@aba.pl","cccccc.pl"]})
         .then(response => {
@@ -66,7 +97,7 @@ describe("Test the POST meeting", () => {
           done()
         })
     })
-    test("It should response that the duration is not integer", done => {
+    test("It should respond that the duration is not integer", done => {
       request(app).post("/meeting")
         .send({...body, duration: "ala"})
         .then(response => {
@@ -75,7 +106,7 @@ describe("Test the POST meeting", () => {
           done()
         })
     })
-    test("It should response that the uuid is incorrect", done => {
+    test("It should respond that the uuid is incorrect", done => {
       request(app).post("/meeting")
         .send({...body, uuid: "alazzascxzcx"})
         .then(response => {
@@ -102,7 +133,7 @@ describe("Test the PUT meeting", () => {
 
 
     
-    test("It should response the correct PUT", done => {
+    test("It should respond the correct PUT", done => {
       request(app).put("/meeting/"+uuid)
         .send(updatedBody)
         .then(response => {
@@ -123,7 +154,7 @@ describe("Test the PUT meeting", () => {
         })
     })
     
-    test("It should response that guest mail is incorrect", done => {
+    test("It should respond that guest mail is incorrect", done => {
       request(app).put("/meeting/"+uuid)
         
         .send({...body, "guest": "aa.pl"})
@@ -134,7 +165,7 @@ describe("Test the PUT meeting", () => {
         })
     })
 
-    test("It should response that there are no hosts", done => {
+    test("It should respond that there are no hosts", done => {
       request(app).put("/meeting/"+uuid)
         .send({...body, "hosts": []})
         .then(response => {
@@ -144,7 +175,7 @@ describe("Test the PUT meeting", () => {
         })
     })
 
-    test("It should response that the hosts mail is incorrect", done => {
+    test("It should respond that the hosts mail is incorrect", done => {
       request(app).put("/meeting/"+uuid)
         .send({...body, "hosts": ["aba@aba.pl","cccccc.pl"]})
         .then(response => {
@@ -153,7 +184,7 @@ describe("Test the PUT meeting", () => {
           done()
         })
     })
-    test("It should response that the duration is not integer", done => {
+    test("It should respond that the duration is not integer", done => {
       request(app).put("/meeting/"+uuid)
         .send({...body, "duration": "ala"})
         .then(response => {
@@ -162,10 +193,23 @@ describe("Test the PUT meeting", () => {
           done()
         })
     })
+    test("It should respond that the meeting has been reserved", done => {
+        request(app).put("/meeting/"+uuid+"/pick_time_slot")
+            .send(pickedTimeSlot)
+            .then(response => {
+                expect(response.statusCode).toBe(200)
+                expect(response.body.msg).toBe("Meeting reserved")
+                return db.models.Meeting.findByPk(uuid)
+                })
+            .then(meeting => {
+                expect(meeting.startTime.getTime()).toBe(pickedTimeSlot.startTime.getTime())
+                done()
+            })
+    })
   })
 
-  describe("Test the DELETE meeting", () => {
-    test("It should response the correct DELETE", done => {
+describe("Test the DELETE meeting", () => {
+    test("It should respond the correct DELETE", done => {
         request(app).delete("/meeting/"+uuid)
           .then(response => {
             expect(response.statusCode).toBe(200)

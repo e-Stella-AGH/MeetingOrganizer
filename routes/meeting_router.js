@@ -1,13 +1,17 @@
 const {meetingService} = require("../services/meeting_service")
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 
-//TOMEK
 router.get('/:uuid', function(req, res, next) {
-  res.send(meetingService.getTimeSlotsIntersection(req.params['uuid']));
+  const uuid = req.params.uuid
+  meetingService.getTimeSlotsIntersection(uuid)
+      .then(result => res.status(result.status).send(result))
 });
 router.put('/:uuid/pick_time_slot', function(req, res, next) {
-  res.send("choose timeslot");  
+  const uuid = req.params.uuid
+  const parsed = req.body
+  meetingService.pickTimeSlot(uuid, parsed)
+      .then(result => res.status(result.status).send(result))
 });
 
 router.post('/', function(req, res, next) {

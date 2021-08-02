@@ -19,5 +19,6 @@ exports.models = {
     Organizer: Organizer,
     Meeting: Meeting,
     Host: Host,
-    Guest: Guest
+    Guest: Guest,
+    TimeSlot: TimeSlot
 }
