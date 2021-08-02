@@ -8,8 +8,8 @@ const createResponse = Responses.createResponse
 
 const BAD_REQUEST_CODE = 400
 
-const findOrCreateGuest = async(email) => {
-    const guest = await Guest.findOrCreate({where:{email: email}})
+const findOrCreateGuest = async (email) => {
+    const guest = await Guest.findOrCreate({ where: { email: email } })
     return guest[0];
 }
 
@@ -19,10 +19,10 @@ const findOrCreateHosts = async (emails) => {
     return hostsArray.map(hostArray => hostArray[0])
 }
 
-const areNewHosts = async (meeting,hostsMails) => {
+const areNewHosts = async (meeting, hostsMails) => {
     const meetingHosts = await meeting.getHosts();
-    const meetingMails = meetingHosts.map(host => host.emial)
-    return JSON.stringify(meetingMails) === JSON.stringify(hostsMails)
+    const meetingMails = meetingHosts.map(host => host.email).sort()
+    return JSON.stringify(meetingMails) === JSON.stringify(hostsMails.sort())
 }
 
 const isNewGuest = async (meeting, guestMail) => {
@@ -30,8 +30,8 @@ const isNewGuest = async (meeting, guestMail) => {
     return guest.email === guestMail
 }
 
-const updateMeetingHosts = async(meeting,hostsMails) => {
-    if(await areNewHosts(meeting,hostsMails))return;
+const updateMeetingHosts = async (meeting, hostsMails) => {
+    if (await areNewHosts(meeting, hostsMails)) return;
     const hosts = await findOrCreateHosts(hostsMails)
     await meeting.setHosts(hosts)
 }
@@ -50,8 +50,7 @@ const addHosts = async (meeting, hostsMails) => {
     const hosts = await findOrCreateHosts(hostsMails)
     await meeting.setHosts(hosts)
 }
-const updateMeetingDuration = async(meeting, duration) => 
-    {if(meeting.duration!==duration) await meeting.update({duration: duration}, {where: {uuid: meeting.uuid}})}
+const updateMeetingDuration = async (meeting, duration) => { if (meeting.duration !== duration) await meeting.update({ duration: duration }, { where: { uuid: meeting.uuid } }) }
 
 const meetingService = {
 
@@ -60,10 +59,10 @@ const meetingService = {
         if (checkData !== true) return createResponse(checkData, BAD_REQUEST_CODE)
         const data = uuid === undefined ? { duration: duration } : { uuid: uuid, duration: duration }
         const meeting = await Meeting.create(data)
-        await addGuest(meeting,guestMail)
-        await addHosts(meeting,hostsMails)
+        await addGuest(meeting, guestMail)
+        await addHosts(meeting, hostsMails)
         await meeting.setOrganizer(creator)
-        return { ...createResponse("Meeting added",201), uuid: meeting.uuid }
+        return { ...createResponse("Meeting added", 201), uuid: meeting.uuid }
     },
 
 
