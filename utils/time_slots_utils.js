@@ -1,6 +1,8 @@
 const {models} = require('../db/relations')
 const TimeSlot = models.TimeSlot
 
+const minDuration = 15
+
 const TimeSlotsUtils = {
 
     getIntersection: function (slots) {
@@ -19,7 +21,7 @@ const TimeSlotsUtils = {
             vals = it_slots.map(slot => slot !== undefined ? slot.startDatetime.getTime() + slot.duration * 60000 : undefined)
             r = Math.min(...vals)
 
-            if (l + 15 <= r) {
+            if (l + minDuration <= r) {
                 res.push({startDatetime: new Date(l), duration: (new Date(r) - new Date(l)) / 60000})
             }
 
@@ -33,7 +35,7 @@ const TimeSlotsUtils = {
         return res
     },
 
-    slice: function (slot, reservation) {
+    sliceSlots: function (slot, reservation) {
         if (slot.startDatetime >= reservation.startTime && slot.duration <= reservation.duration) {
             return TimeSlot.destroy({where: {id: slot.id}})
         } else {

@@ -2,7 +2,6 @@ const request = require("supertest");
 const db = require("../db/relations")
 const {sequelize} = require("../db/sequelizer")
 const app = require("../app");
-const {HostService} = require('../services/host_service')
 
 const body = {
     "duration": 30,
@@ -49,7 +48,6 @@ describe("Test the GET on host", () => {
             request(app).get("/host/" + host.uuid).then(response => {
                     expect(response.statusCode).toBe(200);
                     const hostResponse = response.body.host
-                console.log(hostResponse)
                     expect(hostResponse.email).toBe(body.hosts[0])
                     expect(JSON.stringify(hostResponse.TimeSlots
                         .map(slot => {return {startDatetime: slot.startDatetime, duration: slot.duration}})))
