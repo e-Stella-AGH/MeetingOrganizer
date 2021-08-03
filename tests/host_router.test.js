@@ -5,6 +5,8 @@ const app = require("../app");
 const {Utils} = require("./test_utils")
 
 describe("Test the GET on host", () => {
+
+
     beforeAll(async () => {
         await sequelize.sync()
         jwt = await Utils.registerAndLoginUser(bodyLogin)

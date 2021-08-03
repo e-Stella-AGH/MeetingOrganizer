@@ -13,7 +13,7 @@ describe("Test the POST meeting", () => {
         jwt2 = await Utils.registerAndLoginUser(bodyLogin2)
     })
 
-    test("It should respone that the meeting was added", done => {
+    test("It should respond that the meeting was added", done => {
         request(app).post("/meeting").set(header, jwt)
             .send(body)
             .then(response => {
@@ -23,7 +23,8 @@ describe("Test the POST meeting", () => {
             })
     })
 
-    test("It should response that guest mail is incorrect", done => {
+
+    test("It should respond that guest mail is incorrect", done => {
         request(app).post("/meeting").set(header, jwt)
             .send({ ...body, guest: "aa.pl" })
             .then(response => {
@@ -33,7 +34,7 @@ describe("Test the POST meeting", () => {
             })
     })
 
-    test("It should response that there are no hosts", done => {
+    test("It should respond that there are no hosts", done => {
         request(app).post("/meeting").set(header, jwt)
             .send({ ...body, hosts: [] })
             .then(response => {
@@ -43,27 +44,27 @@ describe("Test the POST meeting", () => {
             })
     })
 
-    test("It should response that the hosts mail is incorrect", done => {
+    test("It should respond that the hosts mail is incorrect", done => {
         request(app).post("/meeting").set(header, jwt)
-            .send({ ...body, hosts: ["aba@aba.pl", "cccccc.pl"] })
+            .send({...body, hosts: ["aba@aba.pl", "cccccc.pl"]})
             .then(response => {
                 expect(response.statusCode).toBe(BAD_REQUEST_CODE)
                 expect(response.body.msg).toBe("These are not valid mails: cccccc.pl")
                 done()
             })
     })
-    test("It should response that the duration is not integer", done => {
+    test("It should respond that the duration is not integer", done => {
         request(app).post("/meeting").set(header, jwt)
-            .send({ ...body, duration: "ala" })
+            .send({...body, duration: "ala"})
             .then(response => {
                 expect(response.statusCode).toBe(BAD_REQUEST_CODE)
                 expect(response.body.msg).toBe("Duration is not proper integer")
                 done()
             })
     })
-    test("It should response that the uuid is incorrect", done => {
+    test("It should respond that the uuid is incorrect", done => {
         request(app).post("/meeting").set(header, jwt)
-            .send({ ...body, uuid: "alazzascxzcx" })
+            .send({...body, uuid: "alazzascxzcx"})
             .then(response => {
                 expect(response.statusCode).toBe(BAD_REQUEST_CODE)
                 expect(response.body.msg).toBe("Not proper UUID")
@@ -71,11 +72,10 @@ describe("Test the POST meeting", () => {
             })
     })
 
-
-    test("It should respone that the meeting was added with uuid", done => {
+    test("It should respond that the meeting was added with uuid", done => {
         request(app).post("/meeting").set(header, jwt)
 
-            .send({ ...body, uuid: uuid })
+            .send({...body, uuid: uuid})
             .then(response => {
                 expect(response.statusCode).toBe(201)
                 expect(response.body.msg).toBe("Meeting added")
@@ -86,6 +86,7 @@ describe("Test the POST meeting", () => {
     test("It should send unathorized with no header", done => {
         request(app).post("/meeting")
             .send({ ...body, uuid: uuid })
+            .send({...body, uuid: uuid})
             .then(response => {
                 expect(response.statusCode).toBe(401)
                 expect(response.text).toBe("Unauthorized")
@@ -95,6 +96,7 @@ describe("Test the POST meeting", () => {
     test("It should send unathorized with bad header", done => {
         request(app).post("/meeting").set(header, "14235151341")
             .send({ ...body, uuid: uuid })
+            .send({...body, uuid: uuid})
             .then(response => {
                 expect(response.statusCode).toBe(401)
                 expect(response.text).toBe("Unauthorized")
@@ -290,3 +292,4 @@ const pickedTimeSlot = {
 }
 
 const BAD_REQUEST_CODE = 400
+
