@@ -205,7 +205,6 @@ describe("Test the PUT meeting", () => {
                 done()
             })
     })
-
 })
 
 describe("Test the DELETE meeting", () => {

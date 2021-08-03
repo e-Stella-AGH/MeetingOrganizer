@@ -14,7 +14,6 @@ const BAD_REQUEST_CODE = 400
 Meeting.hosts = Meeting.belongsToMany(Host, {through: "MeetingHost"})
 Host.timeSlots = Host.hasMany(TimeSlot)
 
-
 const findOrCreateGuest = async (email) => {
     const guest = await Guest.findOrCreate({ where: { email: email } })
     return guest[0];
@@ -68,7 +67,13 @@ const getMeetingWithHosts = async (uuid) => {
             model: Host
         }
     })
+
 }
+const addHosts = async (meeting, hostsMails) => {
+    const hosts = await findOrCreateHosts(hostsMails)
+    await meeting.setHosts(hosts)
+}
+const updateMeetingDuration = async (meeting, duration) => { if (meeting.duration !== duration) await meeting.update({ duration: duration }, { where: { uuid: meeting.uuid } }) }
 
 const meetingService = {
 
