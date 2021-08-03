@@ -6,22 +6,7 @@ const {Checker} = require('./data_checker')
 
 Host.timeSlots = Host.hasMany(TimeSlot);
 
-const HostService = {
-    createHost: async () => {
-        return Host.create({
-            email: "andrzej@duda.pl",
-            TimeSlots: [{
-                startDatetime: Date(),
-                duration: 45
-            }]
-        }, {
-            include: [{
-                association: Host.timeSlots,
-            }
-            ]
-        })
-    },
-
+const hostService = {
     getHostWithTimeSlots: async(uuid) => {
         const host = await Host.findOne({
             attributes: ['email'],
@@ -34,14 +19,15 @@ const HostService = {
     },
 
     updateHostsTimeSlots: async (uuid, timeSlots) => {
+        if (timeSlots.some(slot => Checker.checkTimeSlot(slot) !== true)) {
+            return RestUtils.createResponse(`Cannot set timeSlots in the past!`, RestUtils.BAD_REQUEST_CODE)
+        }
         TimeSlot.destroy({
             where: {
                 HostUuid: uuid
             }
         }).then(async _ => {
             for (const timeSlot of timeSlots) {
-                const checkData = Checker.checkTimeSlot(timeSlot)
-                if (checkData !== true) return RestUtils.createResponse(`Cannot set timeSlots in the past!`, RestUtils.BAD_REQUEST_CODE)
                 await TimeSlot.create({
                     startDatetime: timeSlot.startDatetime,
                     duration: timeSlot.duration,
@@ -54,4 +40,4 @@ const HostService = {
 }
 
 
-exports.HostService = HostService
+exports.HostService = hostService

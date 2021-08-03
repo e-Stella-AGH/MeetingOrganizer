@@ -15,10 +15,4 @@ router.put('/:uuid', function(req, res, next) {
       .then(result => res.status(result.status).send(result))
 });
 
-router.post('/', function(req, res, next) {
-  HostService.createHost().then(r => {
-    res.send(r)
-  })
-});
-
 module.exports = router;

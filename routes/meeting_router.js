@@ -5,13 +5,13 @@ var router = express.Router();
 
 router.get('/:uuid', function(req, res, next) {
   const uuid = req.params.uuid
-  meetingService.getTimeSlotsIntersection(uuid)
+  MeetingService.getTimeSlotsIntersection(uuid)
       .then(result => res.status(result.status).send(result))
 });
 router.put('/:uuid/pick_time_slot', function(req, res, next) {
   const uuid = req.params.uuid
   const parsed = req.body
-  meetingService.pickTimeSlot(uuid, parsed)
+  MeetingService.pickTimeSlot(uuid, parsed)
       .then(result => res.status(result.status).send(result))
 });
 
