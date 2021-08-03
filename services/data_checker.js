@@ -32,6 +32,7 @@ const Checker = {
         if (new Date(timeSlot.startDatetime).getTime() < Date.now()) return "Time slot cannot start in the past!"
         return true
     }
+
 }
 
 exports.Checker = Checker

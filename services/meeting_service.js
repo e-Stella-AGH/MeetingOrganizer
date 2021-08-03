@@ -10,6 +10,7 @@ const {HostService} = require('../services/host_service')
 const {TimeSlotsUtils} = require('../utils/time_slots_utils')
 const {RestUtils} = require('../utils/rest_utils')
 
+const BAD_REQUEST_CODE = 400
 Meeting.hosts = Meeting.belongsToMany(Host, {through: "MeetingHost"})
 Host.timeSlots = Host.hasMany(TimeSlot)
 
@@ -73,7 +74,7 @@ const meetingService = {
 
     createMeeting: async (uuid, hostsMails, guestMail, duration, creator) => {
         const checkData = uuid === undefined ? Checker.checkData(hostsMails, guestMail, duration) : Checker.checkDataWithUUID(uuid, hostsMails, guestMail, duration)
-        if (checkData !== true) return createResponse(checkData, RestUtils.BAD_REQUEST_CODE)
+        if (checkData !== true) return createResponse(checkData, BAD_REQUEST_CODE)
         const data = uuid === undefined ? { duration: duration } : { uuid: uuid, duration: duration }
         const meeting = await Meeting.create(data)
         await addGuest(meeting, guestMail)
@@ -85,10 +86,10 @@ const meetingService = {
 
     updateMeeting: async (meeting, hostsMails, guestMail, duration) => {
         const checkData = Checker.checkData(hostsMails, guestMail, duration)
-        if (checkData !== true) return createResponse(checkData, RestUtils.BAD_REQUEST_CODE)
+        if (checkData !== true) return createResponse(checkData, BAD_REQUEST_CODE)
         console.log(meeting)
         console.log(meeting.startTime)
-        if (meeting.startTime !== null) return createResponse("You can't update scheduled meeting", RestUtils.BAD_REQUEST_CODE)
+        if (meeting.startTime !== null) return createResponse("You can't update scheduled meeting", BAD_REQUEST_CODE)
         await updateMeetingHosts(meeting, hostsMails)
         await updateMeetingGuest(meeting, guestMail)
         await updateMeetingDuration(meeting, duration)
