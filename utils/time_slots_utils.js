@@ -2,6 +2,7 @@ const {models} = require('../db/relations')
 const TimeSlot = models.TimeSlot
 
 const minDuration = 15
+const minToMsMult = 60000
 
 const TimeSlotsUtils = {
 
@@ -18,11 +19,11 @@ const TimeSlotsUtils = {
             let vals = it_slots.map(slot => slot !== undefined ? slot.startDatetime.getTime() : undefined)
             l = Math.max(...vals)
 
-            vals = it_slots.map(slot => slot !== undefined ? slot.startDatetime.getTime() + slot.duration * 60000 : undefined)
+            vals = it_slots.map(slot => slot !== undefined ? slot.startDatetime.getTime() + slot.duration * minToMsMult : undefined)
             r = Math.min(...vals)
 
             if (l + minDuration <= r) {
-                res.push({startDatetime: new Date(l), duration: (new Date(r) - new Date(l)) / 60000})
+                res.push({startDatetime: new Date(l), duration: (new Date(r) - new Date(l)) / minToMsMult})
             }
 
             let valsCopy = [...vals]
@@ -40,22 +41,22 @@ const TimeSlotsUtils = {
             return TimeSlot.destroy({where: {id: slot.id}})
         } else {
             if (slot.startDatetime < reservation.startTime) {
-                let slotEndDate = slot.startDatetime.getTime() + slot.duration * 60000
+                let slotEndDate = slot.startDatetime.getTime() + slot.duration * minToMsMult
                 let meetingStartDate = reservation.startTime.getTime()
-                let meetingEndDate = reservation.startTime.getTime() + reservation.duration * 60000
+                let meetingEndDate = reservation.startTime.getTime() + reservation.duration * minToMsMult
 
                 if (slotEndDate < meetingStartDate) {
                     return null
                 }
                 if (slotEndDate > meetingEndDate) {
-                    let newDuration = (reservation.startTime.getTime() - slot.startDatetime.getTime()) / 60000
+                    let newDuration = (reservation.startTime.getTime() - slot.startDatetime.getTime()) / minToMsMult
                     return TimeSlot.update({duration: newDuration}, {
                         where: {
                             id: slot.id
                         }
                     })
                 } else {
-                    let newDuration = (reservation.startTime.getTime() - slot.startDatetime.getTime()) / 60000
+                    let newDuration = (reservation.startTime.getTime() - slot.startDatetime.getTime()) / minToMsMult
                     return TimeSlot.update({duration: newDuration}, {
                         where: {
                             id: slot.id
@@ -63,16 +64,16 @@ const TimeSlotsUtils = {
                     }).then(_ => {
                         return TimeSlot.create({
                             startDatetime: new Date(meetingEndDate),
-                            duration: (slotEndDate - meetingEndDate) / 60000
+                            duration: (slotEndDate - meetingEndDate) / minToMsMult
                         })
                     })
                 }
             } else {
-                let slotEndDate = slot.startDatetime.getTime() + slot.duration * 60000
-                let meetingEndDate = reservation.startTime.getTime() + reservation.duration * 60000
+                let slotEndDate = slot.startDatetime.getTime() + slot.duration * minToMsMult
+                let meetingEndDate = reservation.startTime.getTime() + reservation.duration * minToMsMult
                 return TimeSlot.update({
                     startDatetime: new Date(meetingEndDate),
-                    duration: (slotEndDate - meetingEndDate) / 60000
+                    duration: (slotEndDate - meetingEndDate) / minToMsMult
                 }, {
                     where: {
                         id: slot.id
