@@ -69,11 +69,6 @@ const getMeetingWithHosts = async (uuid) => {
     })
 
 }
-const addHosts = async (meeting, hostsMails) => {
-    const hosts = await findOrCreateHosts(hostsMails)
-    await meeting.setHosts(hosts)
-}
-const updateMeetingDuration = async (meeting, duration) => { if (meeting.duration !== duration) await meeting.update({ duration: duration }, { where: { uuid: meeting.uuid } }) }
 
 const meetingService = {
 

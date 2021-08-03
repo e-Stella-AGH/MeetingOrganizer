@@ -23,7 +23,7 @@ describe("Test the POST meeting", () => {
       })
   })
 
-  test("It should response that guest mail is incorrect", done => {
+  test("It should respond that guest mail is incorrect", done => {
     request(app).post("/meeting").set(header, jwt)
       .send({ ...body, guest: "aa.pl" })
       .then(response => {
@@ -33,7 +33,7 @@ describe("Test the POST meeting", () => {
       })
   })
 
-  test("It should response that there are no hosts", done => {
+  test("It should respond that there are no hosts", done => {
     request(app).post("/meeting").set(header, jwt)
       .send({ ...body, hosts: [] })
       .then(response => {
@@ -43,7 +43,7 @@ describe("Test the POST meeting", () => {
       })
   })
 
-  test("It should response that the hosts mail is incorrect", done => {
+  test("It should respond that the hosts mail is incorrect", done => {
     request(app).post("/meeting").set(header, jwt)
       .send({ ...body, hosts: ["aba@aba.pl", "cccccc.pl"] })
       .then(response => {
@@ -52,7 +52,7 @@ describe("Test the POST meeting", () => {
         done()
       })
   })
-  test("It should response that the duration is not integer", done => {
+  test("It should respond that the duration is not integer", done => {
     request(app).post("/meeting").set(header, jwt)
       .send({ ...body, duration: "ala" })
       .then(response => {
@@ -61,7 +61,7 @@ describe("Test the POST meeting", () => {
         done()
       })
   })
-  test("It should response that the uuid is incorrect", done => {
+  test("It should respond that the uuid is incorrect", done => {
     request(app).post("/meeting").set(header, jwt)
       .send({ ...body, uuid: "alazzascxzcx" })
       .then(response => {
@@ -83,7 +83,7 @@ describe("Test the POST meeting", () => {
       })
   })
 
-  test("It should send unathorized with no header", done => {
+  test("It should send unauthorized with no header", done => {
     request(app).post("/meeting")
       .send({ ...body, uuid: uuid })
       .then(response => {
@@ -92,7 +92,7 @@ describe("Test the POST meeting", () => {
         done()
       })
   })
-  test("It should send unathorized with bad header", done => {
+  test("It should send unauthorized with bad header", done => {
     request(app).post("/meeting").set(header, "14235151341")
       .send({ ...body, uuid: uuid })
       .then(response => {
@@ -105,7 +105,7 @@ describe("Test the POST meeting", () => {
 
 describe("Test the PUT meeting", () => {
 
-  test("It should response the correct PUT", done => {
+  test("It should respond the correct PUT", done => {
     request(app).put("/meeting/" + uuid).set(header, jwt)
       .send(updatedBody)
       .then(response => {
@@ -126,7 +126,7 @@ describe("Test the PUT meeting", () => {
       })
   })
 
-  test("It should response that guest mail is incorrect", done => {
+  test("It should respond that guest mail is incorrect", done => {
     request(app).put("/meeting/" + uuid).set(header, jwt)
 
       .send({ ...body, "guest": "aa.pl" })
@@ -137,7 +137,7 @@ describe("Test the PUT meeting", () => {
       })
   })
 
-  test("It should response that there are no hosts", done => {
+  test("It should respond that there are no hosts", done => {
     request(app).put("/meeting/" + uuid).set(header, jwt)
       .send({ ...body, "hosts": [] })
       .then(response => {
@@ -147,7 +147,7 @@ describe("Test the PUT meeting", () => {
       })
   })
 
-  test("It should response that the hosts mail is incorrect", done => {
+  test("It should respond that the hosts mail is incorrect", done => {
     request(app).put("/meeting/" + uuid).set(header, jwt)
       .send({ ...body, "hosts": ["aba@aba.pl", "cccccc.pl"] })
       .then(response => {
@@ -156,7 +156,7 @@ describe("Test the PUT meeting", () => {
         done()
       })
   })
-  test("It should response that the duration is not integer", done => {
+  test("It should respond that the duration is not integer", done => {
     request(app).put("/meeting/" + uuid).set(header, jwt)
       .send({ ...body, "duration": "ala" })
       .then(response => {
@@ -165,7 +165,7 @@ describe("Test the PUT meeting", () => {
         done()
       })
   })
-  test("It should send unathorized with no header", done => {
+  test("It should send unauthorized with no header", done => {
     request(app).put("/meeting/" + uuid)
       .send({ ...body, uuid: uuid })
       .then(response => {
@@ -174,7 +174,7 @@ describe("Test the PUT meeting", () => {
         done()
       })
   })
-  test("It should send unathorized with bad header", done => {
+  test("It should send unauthorized with bad header", done => {
     request(app).put("/meeting/" + uuid).set(header, "14235151341")
       .send({ ...body, uuid: uuid })
       .then(response => {
@@ -183,7 +183,7 @@ describe("Test the PUT meeting", () => {
         done()
       })
   })
-  test("It should send unathorized with not meeting organizer header", done => {
+  test("It should send unauthorized with not meeting organizer header", done => {
     request(app).put("/meeting/" + uuid).set(header, jwt2)
       .send({ ...body, uuid: uuid })
       .then(response => {
@@ -210,7 +210,7 @@ describe("Test the PUT meeting", () => {
 describe("Test the DELETE meeting", () => {
 
 
-  test("It should send unathorized with no header", done => {
+  test("It should send unauthorized with no header", done => {
     request(app).delete("/meeting/" + uuid)
       .send({ ...body, uuid: uuid })
       .then(response => {
@@ -219,7 +219,7 @@ describe("Test the DELETE meeting", () => {
         done()
       })
   })
-  test("It should send unathorized with bad header", done => {
+  test("It should send unauthorized with bad header", done => {
     request(app).delete("/meeting/" + uuid).set(header, "14235151341")
       .send({ ...body, uuid: uuid })
       .then(response => {
@@ -228,7 +228,7 @@ describe("Test the DELETE meeting", () => {
         done()
       })
   })
-  test("It should send unathorized with not meeting organizer header", done => {
+  test("It should send unauthorized with not meeting organizer header", done => {
     request(app).delete("/meeting/" + uuid).set(header, jwt2)
       .send({ ...body, uuid: uuid })
       .then(response => {
@@ -238,7 +238,7 @@ describe("Test the DELETE meeting", () => {
       })
   })
 
-  test("It should response the correct DELETE", done => {
+  test("It should respond the correct DELETE", done => {
     request(app).delete("/meeting/" + uuid).set(header, jwt)
       .then(response => {
         expect(response.statusCode).toBe(200)
@@ -246,7 +246,7 @@ describe("Test the DELETE meeting", () => {
         done()
       })
   })
-  test("It should response the 404", done => {
+  test("It should respond the 404", done => {
     request(app).delete("/meeting/" + uuid).set(header, jwt)
       .then(response => {
         expect(response.statusCode).toBe(404)
