@@ -23,6 +23,11 @@ const Checker = {
         return true
     },
 
+    checkEmail: (email) => {
+        if(!checkMail(email)) return "Not valid email"
+        return true
+    },
+
     checkTimeSlot: (timeSlot) => {
         if (new Date(timeSlot.startDatetime).getTime() < Date.now()) return "Time slot cannot start in the past!"
         return true
