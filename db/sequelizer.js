@@ -2,7 +2,6 @@ const { Sequelize } = require('sequelize')
 const env = process.env
 const isPostgres = "DATABASE_URL" in env
 const dbUri = isPostgres ? env.DATABASE_URL : 'sqlite::memory:'
-const isPostgres = true
 const options = isPostgres ? {
     dialect: "postgres",
     protocol: 'postgres',
