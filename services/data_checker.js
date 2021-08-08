@@ -29,7 +29,7 @@ const Checker = {
     },
 
     checkTimeSlot: (timeSlot) => {
-        if (!("startDatetime" in timeSlot) || !("duration" in timeSlot)) return "TimeSlot needs to have \"startDatetime\" and \"duration\" parameters!"
+        if (!("startDatetime" in timeSlot) || !("duration" in timeSlot)) return 'TimeSlot needs to have "startDatetime" and "duration" parameters!'
         if (new Date(timeSlot.startDatetime).getTime() < Date.now()) return "Time slot cannot start in the past!"
         return true
     }

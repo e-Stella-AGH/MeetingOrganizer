@@ -28,7 +28,7 @@ const TimeSlotsUtils = {
 
             let valsCopy = [...vals]
             while (valsCopy.indexOf(r) === valsCopy.lastIndex) {
-                valsCopy = valsCopy.filter(v => valsCopy.indexOf(v) !== r)
+                valsCopy = valsCopy.filter((v, i) => i !== valsCopy.indexOf(r))
                 r = Math.min(...valsCopy)
             }
             pointers[vals.indexOf(r)]++
