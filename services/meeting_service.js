@@ -5,8 +5,14 @@ const Guest = models.Guest
 const Host = models.Host
 const { Responses } = require('../utils/responses')
 const createResponse = Responses.createResponse
+const TimeSlot = models.TimeSlot
+const {HostService} = require('../services/host_service')
+const {TimeSlotsUtils} = require('../utils/time_slots_utils')
+const {RestUtils} = require('../utils/rest_utils')
 
 const BAD_REQUEST_CODE = 400
+Meeting.hosts = Meeting.belongsToMany(Host, {through: "MeetingHost"})
+Host.timeSlots = Host.hasMany(TimeSlot)
 
 const findOrCreateGuest = async (email) => {
     const guest = await Guest.findOrCreate({ where: { email: email } })
@@ -52,6 +58,18 @@ const addHosts = async (meeting, hostsMails) => {
 }
 const updateMeetingDuration = async (meeting, duration) => { if (meeting.duration !== duration) await meeting.update({ duration: duration }, { where: { uuid: meeting.uuid } }) }
 
+const getMeetingWithHosts = async (uuid) => {
+    return Meeting.findOne({
+        where: {
+            uuid: uuid
+        },
+        include: {
+            model: Host
+        }
+    })
+
+}
+
 const meetingService = {
 
     createMeeting: async (uuid, hostsMails, guestMail, duration, creator) => {
@@ -78,7 +96,33 @@ const meetingService = {
         return createResponse("Meeting updated")
     },
 
-    deleteMeeting: async (uuid) => await Meeting.destroy({ where: { uuid: uuid } })
+    deleteMeeting: async (uuid) => await Meeting.destroy({where: {uuid: uuid}}),
+
+    getTimeSlotsIntersection: async (uuid) => {
+        const meeting = await getMeetingWithHosts(uuid)
+        if (meeting == null) return RestUtils.createResponse("No meeting with such ID!", RestUtils.NOT_FOUND_CODE)
+        let slots = []
+        for (const host of await meeting.getHosts()) {
+            slots.push((await HostService.getHostWithTimeSlots(host.uuid)).host.TimeSlots)
+        }
+        slots.forEach(s => s.sort((a, b) => a.startDatetime < b.startDatetime))
+        const intersection = TimeSlotsUtils.getIntersection(slots)
+        return {...RestUtils.createResponse("Available timeslots"), timeSlots: intersection}
+    },
+
+    pickTimeSlot: async (uuid, req) => {
+        await Meeting.update({startTime: req.startTime}, {
+            where: {
+                uuid: uuid
+            }
+        });
+        const meeting = await getMeetingWithHosts(uuid)
+        for (const host of meeting.Hosts) {
+            const hostResponse = await HostService.getHostWithTimeSlots(host.uuid)
+            hostResponse.host.TimeSlots.forEach(slot => TimeSlotsUtils.sliceSlots(slot, req))
+        }
+        return RestUtils.createResponse("Meeting reserved")
+    }
 
 
 }

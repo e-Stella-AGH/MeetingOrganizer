@@ -26,6 +26,12 @@ const Checker = {
     checkEmail: (email) => {
         if(!checkMail(email)) return "Not valid email"
         return true
+    },
+
+    checkTimeSlot: (timeSlot) => {
+        if (!("startDatetime" in timeSlot) || !("duration" in timeSlot)) return 'TimeSlot needs to have "startDatetime" and "duration" parameters!'
+        if (new Date(timeSlot.startDatetime).getTime() < Date.now()) return "Time slot cannot start in the past!"
+        return true
     }
 
 }

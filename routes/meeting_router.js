@@ -3,12 +3,16 @@ const { MeetingService } = require("../services/meeting_service")
 var express = require('express');
 var router = express.Router();
 
-// TOMEK
-router.get('/<UUID_meeting>', function (req, res, next) {
-  res.send("Timeslots from hosts");
+router.get('/:uuid', function(req, res, next) {
+  const uuid = req.params.uuid
+  MeetingService.getTimeSlotsIntersection(uuid)
+      .then(result => res.status(result.status).send(result))
 });
-router.put('/<UUID_meeting>/pick_time_slot', function (req, res, next) {
-  res.send("choose timeslot");
+router.put('/:uuid/pick_time_slot', function(req, res, next) {
+  const uuid = req.params.uuid
+  const parsed = req.body
+  MeetingService.pickTimeSlot(uuid, parsed)
+      .then(result => res.status(result.status).send(result))
 });
 
 router.post('/',Authorize.authenticateToken, function (req, res) {

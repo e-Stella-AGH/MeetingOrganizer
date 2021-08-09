@@ -1,13 +1,18 @@
 const {Organizer} = require('../db/organizer')
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const {HostService} = require('../services/host_service')
+const router = express.Router();
 
-// TOMEK
-router.get('/<UUID_host>', function(req, res, next) {
-  res.send("get host with his/her timeslots");  
+router.get('/:uuid', function(req, res, next) {
+  const uuid = req.params.uuid
+  HostService.getHostWithTimeSlots(uuid)
+      .then(result => res.status(result.status).send(result))
 });
-router.put('/<UUID_host>', function(req, res, next) {
-  res.send("update host's timeslots");  
+router.put('/:uuid', function(req, res, next) {
+  const uuid = req.params.uuid
+  const parsed = req.body
+  HostService.updateHostsTimeSlots(uuid, parsed)
+      .then(result => res.status(result.status).send(result))
 });
 
 module.exports = router;
