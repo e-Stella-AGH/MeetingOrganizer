@@ -2,15 +2,19 @@ const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+const cors = require('cors');
 
 const indexRouter = require('./routes/index');
 const hostRouter = require('./routes/host_router');
 const organizerRouter = require('./routes/organizer_router');
 const meetingRouter = require('./routes/meeting_router');
-const {sequelize} = require("./db/sequelizer")
-const {models} = require("./db/relations")
+const { sequelize } = require("./db/sequelizer")
+const { models } = require("./db/relations")
 
 const app = express();
+app.use(cors({
+    origin: '*'
+}));
 
 const model = models
 sequelize.sync().then(_ => {
