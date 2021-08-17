@@ -17,9 +17,9 @@ router.post("/login", function (req, res, next) {
         .then(result => res.status(result.status).send(result))
 })
 
-router.put("/",Authorize.authenticateToken, function (req,res,next){
+router.put("/", Authorize.authenticateToken, function (req, res, next) {
     const body = req.body
-    OrganizerService.updateOrganizer(req.user,body.password).then(elem => res.send(elem))
-}) 
+    OrganizerService.updateOrganizer(req.user, body.password).then(elem => res.send(elem))
+})
 
 module.exports = router;
