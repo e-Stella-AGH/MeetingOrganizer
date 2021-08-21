@@ -10,6 +10,8 @@ const invalidResponse = createResponse("Invalid login or password", 400)
 
 const findOrganizerWithEmail = async (email) => await Organizer.findAll({ where: { email: email } })
 
+const generateRandomString = () => Math.random().toString(36).slice(-8);
+
 const organizerService = {
     register: async (email, password) => {
         const checkResult = Checker.checkEmail(email)
@@ -31,6 +33,11 @@ const organizerService = {
         return await Authorize.checkPassword(password, organizer)
             ? createResponse(Authorize.generateAccessToken(organizer))
             : invalidResponse
+    },
+
+    loginWithEmail: async (email) => {
+        let organizer = await Authorize.findOrganizerWithEmail(email)
+        if (organizer === null) await register(email, generateRandomString())
     },
 
     updateOrganizer: async (organizer, password) => {

@@ -6,12 +6,12 @@ const Host = models.Host
 const { Responses } = require('../utils/responses')
 const createResponse = Responses.createResponse
 const TimeSlot = models.TimeSlot
-const {HostService} = require('../services/host_service')
-const {TimeSlotsUtils} = require('../utils/time_slots_utils')
-const {RestUtils} = require('../utils/rest_utils')
+const { HostService } = require('../services/host_service')
+const { TimeSlotsUtils } = require('../utils/time_slots_utils')
+const { RestUtils } = require('../utils/rest_utils')
 
 const BAD_REQUEST_CODE = 400
-Meeting.hosts = Meeting.belongsToMany(Host, {through: "MeetingHost"})
+Meeting.hosts = Meeting.belongsToMany(Host, { through: "MeetingHost" })
 Host.timeSlots = Host.hasMany(TimeSlot)
 
 const findOrCreateGuest = async (email) => {
@@ -87,8 +87,6 @@ const meetingService = {
     updateMeeting: async (meeting, hostsMails, guestMail, duration) => {
         const checkData = Checker.checkData(hostsMails, guestMail, duration)
         if (checkData !== true) return createResponse(checkData, BAD_REQUEST_CODE)
-        console.log(meeting)
-        console.log(meeting.startTime)
         if (meeting.startTime !== null) return createResponse("You can't update scheduled meeting", BAD_REQUEST_CODE)
         await updateMeetingHosts(meeting, hostsMails)
         await updateMeetingGuest(meeting, guestMail)
@@ -96,7 +94,7 @@ const meetingService = {
         return createResponse("Meeting updated")
     },
 
-    deleteMeeting: async (uuid) => await Meeting.destroy({where: {uuid: uuid}}),
+    deleteMeeting: async (uuid) => await Meeting.destroy({ where: { uuid: uuid } }),
 
     getTimeSlotsIntersection: async (uuid) => {
         const meeting = await getMeetingWithHosts(uuid)
@@ -107,11 +105,11 @@ const meetingService = {
         }
         slots.forEach(s => s.sort((a, b) => a.startDatetime < b.startDatetime))
         const intersection = TimeSlotsUtils.getIntersection(slots)
-        return {...RestUtils.createResponse("Available timeslots"), timeSlots: intersection}
+        return { ...RestUtils.createResponse("Available timeslots"), timeSlots: intersection }
     },
 
     pickTimeSlot: async (uuid, req) => {
-        await Meeting.update({startTime: req.startTime}, {
+        await Meeting.update({ startTime: req.startTime }, {
             where: {
                 uuid: uuid
             }
