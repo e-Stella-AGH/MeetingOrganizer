@@ -4,17 +4,16 @@ const serviceUrl = "https://recruitment-service-estella.herokuapp.com/"
 
 
 
-
 const recruitmentServiceVeirfy = async (token) => {
-    const result = await fetch(serviceUrl + "api/users/loggedInUser", {
-        method: 'get',
+    const response = await fetch(serviceUrl + "api/users/loggedInUser", {
+        method: 'GET',
         headers: {
             'Content-Type': 'application/json',
             'x-jwt': token
         }
     })
-    const jsonResult = await result.json()
-    return result.status === 200 ? jsonResult.email : null
+    const jsonResponse = await response.json()
+    return "statusCodeValue" in jsonResponse ? null : jsonResponse.mail
 }
 
-exports.RecruitmentServiceVerify = recruitmentServiceVeirfy
+exports.RecruitmentServiceVerify = { verifyToken: recruitmentServiceVeirfy }

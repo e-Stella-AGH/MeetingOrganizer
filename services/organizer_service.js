@@ -3,12 +3,9 @@ const { Checker } = require('./data_checker')
 const { Authorize } = require('./jwt_service')
 const Organizer = models.Organizer
 const { Responses } = require('../utils/responses')
-const { Meeting } = require('../db/meeting')
 const createResponse = Responses.createResponse
 
 const invalidResponse = createResponse("Invalid login or password", 400)
-
-const findOrganizerWithEmail = async (email) => await Organizer.findAll({ where: { email: email } })
 
 const generateRandomString = () => Math.random().toString(36).slice(-8);
 
@@ -17,8 +14,8 @@ const organizerService = {
         const checkResult = Checker.checkEmail(email)
         if (checkResult !== true) return createResponse(checkResult, 400)
 
-        const organizers = await findOrganizerWithEmail(email)
-        if (organizers.length !== 0) return createResponse("This mail is already used", 400)
+        const organizer = await Authorize.findOrganizerWithEmail(email)
+        if (organizer !== null) return createResponse("This mail is already used", 400)
 
         const newPassword = await Authorize.hashPassword(password)
         await Organizer.create({ email: email, password: newPassword })
@@ -26,10 +23,9 @@ const organizerService = {
     },
 
     login: async (email, password) => {
-        const organizers = await findOrganizerWithEmail(email)
-        if (organizers.length === 0) return invalidResponse
+        const organizer = await Authorize.findOrganizerWithEmail(email)
+        if (organizer === null) return invalidResponse
 
-        const organizer = organizers[0]
         return await Authorize.checkPassword(password, organizer)
             ? createResponse(Authorize.generateAccessToken(organizer))
             : invalidResponse
@@ -37,7 +33,7 @@ const organizerService = {
 
     loginWithEmail: async (email) => {
         let organizer = await Authorize.findOrganizerWithEmail(email)
-        if (organizer === null) await register(email, generateRandomString())
+        if (organizer === null) await organizerService.register(email, generateRandomString())
     },
 
     updateOrganizer: async (organizer, password) => {

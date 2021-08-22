@@ -5,9 +5,7 @@ const { models } = require('../db/relations')
 const Organizer = models.Organizer
 const env = process.env
 const secret = "TOKEN_SECRET" in env ? env.TOKEN_SECRET : "TOKEN_SECRET"
-
 const { IntegrationService } = require("../integration_config")
-
 
 
 const Authorize = {
@@ -29,26 +27,26 @@ const Authorize = {
         const token = req.headers['authorization']
 
         const integrationResult = await IntegrationService.verifyToken(token)
-        if (integrationResult === null) return res.sendStatus(401)
+        if (integrationResult === null) return res.status(401).send("Integration service response unauthorized")
         req.userEmail = integrationResult
         next()
     },
 
     authenticateToken: async (req, res, next) => {
         const token = req.headers['authorization']
+        if (token == null) return res.sendStatus(401)
+
 
         const integrationResult = await IntegrationService.verifyToken(token)
 
         if (integrationResult !== null) {
             const email = integrationResult
-            const organizer = await findOrganizerWithEmail(email)
-            if (organizer === null) return res.sendStatus(401)
+            const organizer = await Authorize.findOrganizerWithEmail(email)
+            if (organizer === null) return res.status(401).send("Integration service response unauthorized")
 
-            req.user = organizers[0]
+            req.user = organizer
             next()
-        } else {
-            if (token == null) return res.sendStatus(401)
-
+        } else
             jwt.verify(token, secret, async (err, user) => {
                 if (err || !user) return res.sendStatus(401)
                 const organizer = await Organizer.findByPk(user.id)
@@ -57,7 +55,7 @@ const Authorize = {
 
                 next()
             })
-        }
+
     },
 
     verifyToken: (token, func) => jwt.verify(token, secret, func),

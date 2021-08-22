@@ -29,7 +29,7 @@ router.post("/login_integration", Authorize.getEmailFromIntegrationToken, functi
 })
 
 router.get("/", Authorize.authenticateToken, function (req, res, next) {
-    res.send(req.user.email)
+    res.send({ mail: req.user.email })
 })
 
 module.exports = router;
