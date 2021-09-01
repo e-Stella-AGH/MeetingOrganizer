@@ -13,7 +13,12 @@ let body = {
 
 const header = Utils.header
 
+const timeout = 30_000
+
 describe("Test the register user", () => {
+
+    jest.setTimeout(timeout)
+
     beforeAll(async () => {
         await sequelize.sync()
     })
@@ -48,6 +53,8 @@ describe("Test the register user", () => {
 
 
 describe("Test the login user", () => {
+
+    jest.setTimeout(timeout)
 
     test("It return jwt token", done => {
         request(app).post("/organizer/login")
@@ -84,6 +91,8 @@ describe("Test the login user", () => {
 
 describe("Test the endpoints for logged in user", () => {
     let jwt
+
+    jest.setTimeout(timeout)
 
     beforeAll(async () => {
         jwt = await Utils.loginUser(body)

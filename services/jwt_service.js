@@ -39,7 +39,7 @@ const Authorize = {
 
         const integrationResult = await IntegrationService.verifyToken(token)
 
-        if (integrationResult !== null) {
+        if (integrationResult !== null && integrationResult !== undefined) {
             const email = integrationResult
             const organizer = await Authorize.findOrganizerWithEmail(email)
             if (organizer === null) return res.status(401).send("Integration service response unauthorized")

@@ -1,11 +1,16 @@
 const request = require("supertest");
 const db = require("../db/relations")
-const {sequelize} = require("../db/sequelizer")
+const { sequelize } = require("../db/sequelizer")
 const app = require("../app");
-const { Utils } = require("./test_utils")
+const { Utils } = require("./test_utils");
+
+
+const timeout = 30_000
+
 
 describe("Test the POST meeting", () => {
 
+  jest.setTimeout(timeout)
 
   beforeAll(async () => {
     await sequelize.sync()
@@ -101,9 +106,22 @@ describe("Test the POST meeting", () => {
         done()
       })
   })
+
+  test("It should responsd with list of 2 meetings", done => {
+    request(app).get("/meeting").set(header, jwt)
+      .send()
+      .then(response => {
+        expect(response.statusCode).toBe(200)
+        expect(length(response.body.msg)).toBe(2)
+        done()
+      })
+  })
 })
 
 describe("Test the PUT meeting", () => {
+
+  jest.setTimeout(timeout)
+
 
   test("It should respond the correct PUT", done => {
     request(app).put("/meeting/" + uuid).set(header, jwt)
@@ -192,23 +210,25 @@ describe("Test the PUT meeting", () => {
         done()
       })
   })
-    test("It should respond that the meeting has been reserved", done => {
-        request(app).put("/meeting/" + uuid + "/pick_time_slot")
-            .send(pickedTimeSlot)
-            .then(response => {
-                expect(response.statusCode).toBe(200)
-                expect(response.body.msg).toBe("Meeting reserved")
-                return db.models.Meeting.findByPk(uuid)
-            })
-            .then(meeting => {
-                expect(meeting.startTime.getTime()).toBe(pickedTimeSlot.startTime.getTime())
-                done()
-            })
-    })
+
+  test("It should respond that the meeting has been reserved", done => {
+    request(app).put("/meeting/" + uuid + "/pick_time_slot")
+      .send(pickedTimeSlot)
+      .then(response => {
+        expect(response.statusCode).toBe(200)
+        expect(response.body.msg).toBe("Meeting reserved")
+        return db.models.Meeting.findByPk(uuid)
+      })
+      .then(meeting => {
+        expect(meeting.startTime.getTime()).toBe(pickedTimeSlot.startTime.getTime())
+        done()
+      })
+  })
 })
 
 describe("Test the DELETE meeting", () => {
 
+  jest.setTimeout(timeout)
 
   test("It should send unauthorized with no header", done => {
     request(app).delete("/meeting/" + uuid)
@@ -256,7 +276,6 @@ describe("Test the DELETE meeting", () => {
   })
 })
 
-
 const body = {
   "duration": 15,
   "hosts": ["aba@aba.pl", "ccc@ccc.pl"],
@@ -284,8 +303,8 @@ let bodyLogin2 = {
 }
 
 const pickedTimeSlot = {
-    "startTime": new Date(2021, 5, 25, 14, 30),
-    "duration": 30
+  "startTime": new Date(2021, 5, 25, 14, 30),
+  "duration": 30
 }
 
 const BAD_REQUEST_CODE = 400

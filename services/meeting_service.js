@@ -9,6 +9,7 @@ const TimeSlot = models.TimeSlot
 const { HostService } = require('../services/host_service')
 const { TimeSlotsUtils } = require('../utils/time_slots_utils')
 const { RestUtils } = require('../utils/rest_utils')
+const { Organizer } = require('../db/organizer')
 
 const BAD_REQUEST_CODE = 400
 Meeting.hosts = Meeting.belongsToMany(Host, { through: "MeetingHost" })
@@ -95,6 +96,20 @@ const meetingService = {
     },
 
     deleteMeeting: async (uuid) => await Meeting.destroy({ where: { uuid: uuid } }),
+
+    getMeetings: async (organizer) => {
+        const meetings = await Meeting.findAll({
+            where: {
+                "organizer.id": organizer.id
+            },
+            include: [
+                { model: Organizer, as: Organizer.tableName }
+            ]
+        })
+
+        return createResponse(meetings)
+    },
+
 
     getTimeSlotsIntersection: async (uuid) => {
         const meeting = await getMeetingWithHosts(uuid)
