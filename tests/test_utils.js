@@ -14,6 +14,10 @@ const utils = {
         await utils.registerUser(body)
         return await utils.loginUser(body)
     },
+
+    fakeRegister: async () => {
+        await utils.registerUser({ "email": "a", "password": "b" })
+    },
     header: "authorization"
 }
 

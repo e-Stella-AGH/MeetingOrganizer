@@ -5,17 +5,20 @@ const app = require("../app");
 const { Utils } = require("./test_utils");
 
 
-const timeout = 30_000
-
 
 describe("Test the POST meeting", () => {
 
-  jest.setTimeout(timeout)
-
-  beforeAll(async () => {
-    await sequelize.sync()
-    jwt = await Utils.registerAndLoginUser(bodyLogin)
-    jwt2 = await Utils.registerAndLoginUser(bodyLogin2)
+  beforeAll((done) => {
+    sequelize.sync()
+      .then(_result => Utils.fakeRegister())
+      .then(_result => Utils.registerAndLoginUser(bodyLogin))
+      .then(result => {
+        jwt = result
+        return Utils.registerAndLoginUser(bodyLogin2)
+      }).then(result => {
+        jwt2 = result
+        done()
+      })
   })
 
   test("It should respone that the meeting was added", done => {
@@ -107,20 +110,18 @@ describe("Test the POST meeting", () => {
       })
   })
 
-  test("It should responsd with list of 2 meetings", done => {
+  test("It should respond with list of 2 meetings", done => {
     request(app).get("/meeting").set(header, jwt)
       .send()
       .then(response => {
         expect(response.statusCode).toBe(200)
-        expect(length(response.body.msg)).toBe(2)
+        expect(response.body.msg.length).toBe(2)
         done()
       })
   })
 })
 
 describe("Test the PUT meeting", () => {
-
-  jest.setTimeout(timeout)
 
 
   test("It should respond the correct PUT", done => {
@@ -227,8 +228,6 @@ describe("Test the PUT meeting", () => {
 })
 
 describe("Test the DELETE meeting", () => {
-
-  jest.setTimeout(timeout)
 
   test("It should send unauthorized with no header", done => {
     request(app).delete("/meeting/" + uuid)

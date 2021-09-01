@@ -9,11 +9,15 @@ const TimeSlot = models.TimeSlot
 const { HostService } = require('../services/host_service')
 const { TimeSlotsUtils } = require('../utils/time_slots_utils')
 const { RestUtils } = require('../utils/rest_utils')
-const { Organizer } = require('../db/organizer')
+const Organizer = models.Organizer
 
 const BAD_REQUEST_CODE = 400
 Meeting.hosts = Meeting.belongsToMany(Host, { through: "MeetingHost" })
 Host.timeSlots = Host.hasMany(TimeSlot)
+
+Meeting.organizer = Meeting.belongsTo(Organizer, { through: "OrganizerMeeting" })
+Organizer.meetings = Organizer.belongsToMany(Meeting, { through: "OrganizerMeeting" })
+
 
 const findOrCreateGuest = async (email) => {
     const guest = await Guest.findOrCreate({ where: { email: email } })
@@ -68,8 +72,8 @@ const getMeetingWithHosts = async (uuid) => {
             model: Host
         }
     })
-
 }
+
 
 const meetingService = {
 
@@ -100,13 +104,13 @@ const meetingService = {
     getMeetings: async (organizer) => {
         const meetings = await Meeting.findAll({
             where: {
-                "organizer.id": organizer.id
+                "$organizer.id$": organizer.id
             },
-            include: [
-                { model: Organizer, as: Organizer.tableName }
-            ]
+            include: [{
+                model: Organizer,
+                as: "Organizer"
+            }]
         })
-
         return createResponse(meetings)
     },
 

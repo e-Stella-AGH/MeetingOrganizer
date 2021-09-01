@@ -5,14 +5,12 @@ const app = require("../app");
 const { HostService } = require('../services/host_service')
 const { Utils } = require("./test_utils")
 
-const timeout = 30_000
 
 describe("Test the PUT on host", () => {
 
-    jest.setTimeout(timeout)
-
     beforeAll(async () => {
         await sequelize.sync()
+        await Utils.fakeRegister()
         jwt = await Utils.registerAndLoginUser(bodyLogin)
         await request(app).post("/meeting").set(header, jwt)
             .send({ ...body, uuid: uuid })
@@ -50,8 +48,6 @@ describe("Test the PUT on host", () => {
 })
 
 describe("Test the GET on meeting", () => {
-
-    jest.setTimeout(timeout)
 
     beforeAll(async () => {
         await sequelize.sync()

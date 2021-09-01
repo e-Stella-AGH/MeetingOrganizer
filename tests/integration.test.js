@@ -13,12 +13,9 @@ const body = {
     password: "a"
 }
 
-const timeout = 30_000
 
 describe("Tests for integration login", () => {
     let jwt
-
-    jest.setTimeout(timeout)
 
     beforeAll(async () => {
         await sequelize.sync()
@@ -54,8 +51,6 @@ describe("Tests for integration login", () => {
 describe("Tests for get email for logged in user", () => {
 
     let jwt
-
-    jest.setTimeout(timeout)
 
     beforeAll(async () => {
         jwt = await RecruitmentServiceUtils.loginUser(body)
