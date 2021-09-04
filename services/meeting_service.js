@@ -109,6 +109,12 @@ const meetingService = {
             include: [{
                 model: Organizer,
                 as: "Organizer"
+            }, {
+                model: Host,
+                as: "Hosts"
+            }, {
+                model: Guest,
+                as: "Guest"
             }]
         })
         return createResponse(meetings)
