@@ -1,13 +1,13 @@
 
-const {Host} = require('../db/host')
-const {TimeSlot} = require('../db/time_slot')
-const {RestUtils} = require('../utils/rest_utils')
-const {Checker} = require('./data_checker')
+const { Host } = require('../db/host')
+const { TimeSlot } = require('../db/time_slot')
+const { RestUtils } = require('../utils/rest_utils')
+const { Checker } = require('./data_checker')
 
 Host.timeSlots = Host.hasMany(TimeSlot);
 
 const hostService = {
-    getHostWithTimeSlots: async(uuid) => {
+    getHostWithTimeSlots: async (uuid) => {
         const host = await Host.findOne({
             attributes: ['email'],
             where: {
@@ -15,7 +15,7 @@ const hostService = {
             },
             include: TimeSlot
         })
-        return {...RestUtils.createResponse("Hosts time slots"), host: host}
+        return { ...RestUtils.createResponse("Hosts time slots"), host: host }
     },
 
     updateHostsTimeSlots: async (uuid, timeSlots) => {

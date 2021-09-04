@@ -3,17 +3,22 @@ const app = require("../app");
 
 
 const utils = {
-    registerUser: async (body) =>   await request(app).post("/organizer/register").send(body),
+    registerUser: async (body) => await request(app).post("/organizer/register").send(body),
 
     loginUser: async (body) => {
         const response = await request(app).post("/organizer/login").send(body)
         return response.body.msg
     },
 
-    registerAndLoginUser:async(body) => {
+    registerAndLoginUser: async (body) => {
         await utils.registerUser(body)
         return await utils.loginUser(body)
-    }
+    },
+
+    fakeRegister: async () => {
+        await utils.registerUser({ "email": "a", "password": "b" })
+    },
+    header: "authorization"
 }
 
 exports.Utils = utils

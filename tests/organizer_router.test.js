@@ -3,16 +3,20 @@ const db = require("../db/relations")
 let { sequelize } = require("../db/sequelizer")
 const { Authorize } = require('../services/jwt_service')
 const app = require("../app");
-const { Utils } = require("./test_utils")
+const { Utils } = require("./test_utils");
+const { response } = require("../app");
 
 let body = {
     "email": "a@a.pl",
     "password": "test"
 }
 
-const header = "authorization"
+const header = Utils.header
+
 
 describe("Test the register user", () => {
+
+
     beforeAll(async () => {
         await sequelize.sync()
     })
@@ -24,12 +28,12 @@ describe("Test the register user", () => {
                 expect(response.statusCode).toBe(201)
                 expect(response.body.msg).toBe("Created user")
                 request(app).post("/organizer/register")
-                .send(body)
-                .then(response => {
-                    expect(response.statusCode).toBe(400)
-                    expect(response.body.msg).toBe("This mail is already used")
-                    done()
-                })
+                    .send(body)
+                    .then(response => {
+                        expect(response.statusCode).toBe(400)
+                        expect(response.body.msg).toBe("This mail is already used")
+                        done()
+                    })
             })
     })
 
@@ -47,6 +51,7 @@ describe("Test the register user", () => {
 
 
 describe("Test the login user", () => {
+
 
     test("It return jwt token", done => {
         request(app).post("/organizer/login")
@@ -81,10 +86,12 @@ describe("Test the login user", () => {
     })
 })
 
-describe("Test the login user", () => {
+describe("Test the endpoints for logged in user", () => {
     let jwt
 
+
     beforeAll(async () => {
+        await Utils.fakeRegister()
         jwt = await Utils.loginUser(body)
     })
 
@@ -95,12 +102,12 @@ describe("Test the login user", () => {
             .then(response => {
                 expect(response.status).toBe(200)
                 expect(response.body.msg).toBe("User updated")
-                return db.models.Organizer.findAll({where: {email: body.email}})
+                return db.models.Organizer.findAll({ where: { email: body.email } })
             })
             .then(organizers => {
                 expect(organizers.length).toBe(1)
                 const organizer = organizers[0]
-                return Authorize.checkPassword(passowrd,organizer)
+                return Authorize.checkPassword(passowrd, organizer)
             })
             .then(result => {
                 expect(result).toBe(true)
@@ -117,13 +124,23 @@ describe("Test the login user", () => {
                 done()
             })
     })
-    test("It should send unathorized because of no bad header", done => {
+    test("It should send unathorized because of bad header", done => {
         const passowrd = "ala"
-        request(app).put("/organizer/").set(header,"1234141")
+        request(app).put("/organizer/").set(header, "1234141")
             .send({ ...body, password: passowrd })
             .then(response => {
                 expect(response.status).toBe(401)
                 expect(response.text).toBe("Unauthorized")
+                done()
+            })
+    })
+
+    test("It should send email of logged in user", done => {
+        request(app).get("/organizer/")
+            .set(header, jwt)
+            .then(response => {
+                expect(response.status).toBe(200)
+                expect(response.body.mail).toBe(body.email)
                 done()
             })
     })
