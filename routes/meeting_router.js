@@ -33,7 +33,7 @@ router.put('/:meeting_uuid', Authorize.authenticateToken, Authorize.isMeetingOrg
 });
 router.delete('/:meeting_uuid', Authorize.authenticateToken, Authorize.isMeetingOrganizer, function (req, res, next) {
   const uuid = req.params.meeting_uuid
-  MeetingService.deleteMeeting(uuid).then(response => res.send({ msg: "Meeting deleted" }))
+  MeetingService.deleteMeeting(uuid).then(response => res.status(200).send({ msg: "Meeting deleted" }))
 });
 
 
