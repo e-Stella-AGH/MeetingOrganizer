@@ -13,6 +13,7 @@ const body = {
     password: "a"
 }
 
+jest.setTimeout(15_000);
 
 describe("Tests for integration login", () => {
     let jwt

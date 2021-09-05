@@ -9,7 +9,6 @@ Host.timeSlots = Host.hasMany(TimeSlot);
 const hostService = {
     getHostWithTimeSlots: async (uuid) => {
         const host = await Host.findOne({
-            attributes: ['email'],
             where: {
                 uuid: uuid
             },

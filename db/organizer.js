@@ -1,16 +1,14 @@
-const {sequelize} = require("./sequelizer")
-const {DataTypes} =  require("sequelize")
-
-console.log(sequelize)
+const { sequelize } = require("./sequelizer")
+const { DataTypes } = require("sequelize")
 
 const Organizer = sequelize.define("Organizer", {
     id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
-        primaryKey: true    
+        primaryKey: true
     },
-    email: {type: DataTypes.STRING, allowNull: false, unique:true},
-    password: {type: DataTypes.STRING,  allowNull: false},
+    email: { type: DataTypes.STRING, allowNull: false, unique: true },
+    password: { type: DataTypes.STRING, allowNull: false },
 })
 
 exports.Organizer = Organizer
