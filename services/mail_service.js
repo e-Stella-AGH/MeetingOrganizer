@@ -1,8 +1,7 @@
 const fetch = require("node-fetch")
 
-const serviceUrl = "https://email-service-estella.herokuapp.com/email"
-const selfUrl = "https://meeting-organizer-estella.herokuapp.com/"
-
+const serviceUrl = env.MAIL_SERVICE_URL
+const selfUrl = env.FRONTEND_URL
 const sendMail = async (body) => {
     const result = await fetch(serviceUrl, {
         method: "POST",
@@ -19,7 +18,7 @@ const mailService = {
             sender_email: organizer,
             sender_name: organizer,
             receiver: host.email,
-            content: `Hi
+            content: `Hi,
                 Add more time slots for meeting with ${guest}, because there is no slot where all of you can attend. 
                 You can do this at this link: ${selfUrl + "host/" + host.uuid}.
                 You can contact with other meeting participants: ${hosts.join(", ")}
@@ -48,7 +47,7 @@ const mailService = {
             sender_email: organizer,
             sender_name: organizer,
             receiver: guest,
-            content: `Hi, could you pick timeslot for interview. You can do this at this link: ${selfUrl + "meeting/" + meetingUuid}`
+            content: `Hi, could you pick timeslot for interview? You can do this at this link: ${selfUrl + "meeting/" + meetingUuid}`
         })
     }
 }
