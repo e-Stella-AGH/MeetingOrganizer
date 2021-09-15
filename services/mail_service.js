@@ -1,5 +1,5 @@
 const fetch = require("node-fetch")
-
+const env = process.env
 const serviceUrl = env.MAIL_SERVICE_URL
 const selfUrl = env.FRONTEND_URL
 const sendMail = async (body) => {
