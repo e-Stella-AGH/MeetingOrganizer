@@ -7,8 +7,8 @@ const { TimeSlot } = require('./time_slot')
 Organizer.meetings = Organizer.belongsToMany(Meeting, { through: "OrganizerMeeting" })
 Meeting.organizer = Meeting.belongsTo(Organizer, { through: "OrganizerMeeting" })
 
-Meeting.guest = Meeting.hasOne(Guest, { through: "GuestMeeting" })
-Guest.meetings = Guest.belongsToMany(Meeting, { through: "GuestMeeting" })
+Meeting.guest = Meeting.belongsTo(Guest)
+Guest.meetings = Guest.hasMany(Meeting)
 
 Meeting.hosts = Meeting.belongsToMany(Host, { through: "MeetingHost" })
 Host.meetings = Host.belongsToMany(Meeting, { through: "MeetingHost" })
