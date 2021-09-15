@@ -3,6 +3,7 @@ const env = process.env
 const serviceUrl = env.MAIL_SERVICE_URL
 const selfUrl = env.FRONTEND_URL
 const sendMail = async (body) => {
+    if (serviceUrl === undefined || serviceUrl === null) return false
     const result = await fetch(serviceUrl, {
         method: "POST",
         headers: { 'Content-Type': 'application/json' },
