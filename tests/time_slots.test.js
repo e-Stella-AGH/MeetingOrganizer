@@ -110,16 +110,36 @@ const secondTimeSlots = [
 const timeSlotsIntersection = [
     {
         startDatetime: new Date(2022, 5, 23, 12),
-        duration: 60
+        duration: 30
+    },
+    {
+        startDatetime: new Date(2022, 5, 23, 12, 30),
+        duration: 30
     },
     {
         startDatetime: new Date(2022, 5, 23, 14),
-        duration: 60
+        duration: 30
+    },
+    {
+        startDatetime: new Date(2022, 5, 23, 14, 30),
+        duration: 30
     },
     {
         startDatetime: new Date(2022, 5, 25, 13),
-        duration: 120
-    }
+        duration: 30
+    },
+    {
+        startDatetime: new Date(2022, 5, 25, 13, 30),
+        duration: 30
+    },
+    {
+        startDatetime: new Date(2022, 5, 25, 14),
+        duration: 30
+    },
+    {
+        startDatetime: new Date(2022, 5, 25, 14, 30),
+        duration: 30
+    },
 ]
 
 const uuid = "ad18668e-4a28-4565-9f4a-4eace3068a63"

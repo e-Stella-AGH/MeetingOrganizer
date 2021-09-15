@@ -82,7 +82,8 @@ const getIntersection = async (meeting) => {
         slots.push((await HostService.getHostWithTimeSlots(host.uuid)).host.TimeSlots)
     }
     slots.forEach(s => s.sort((a, b) => a.startDatetime < b.startDatetime))
-    return TimeSlotsUtils.getIntersection(slots)
+    let intersections = TimeSlotsUtils.getIntersection(slots)
+    return TimeSlotsUtils.divideIntersectionOnDurationSlot(intersections, meeting.duration)
 }
 
 const sendMeetingEmail = async (meeting, organizer) => {
