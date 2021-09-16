@@ -163,7 +163,7 @@ const meetingService = {
             }
         });
         const meeting = await getMeetingWithHosts(uuid)
-        for (const host of meeting.Hosts) {
+        for (const host of await meeting.getHosts()) {
             const hostResponse = await HostService.getHostWithTimeSlots(host.uuid)
             hostResponse.host.TimeSlots.forEach(slot => TimeSlotsUtils.sliceSlots(slot, req))
         }
