@@ -40,7 +40,7 @@ const hostService = {
     hostExist: async (req, res, next) => {
         const uuid = req.params.uuid
         const countAll = await Host.findAndCountAll({ where: { uuid: uuid } })
-        if (countAll === 1) return res.status(404).send("User with this uuid not found")
+        if (countAll === 0) return res.status(404).send("User with this uuid not found")
         next()
     }
 }
