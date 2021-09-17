@@ -135,16 +135,11 @@ const meetingService = {
             where: {
                 "$organizer.id$": organizer.id
             },
-            include: [{
+            include: {
                 model: Organizer,
-                as: "Organizer"
-            }, {
                 model: Host,
-                as: "Hosts"
-            }, {
-                model: Guest,
-                as: "Guest"
-            }]
+                model: Guest
+            }
         })
         return createResponse(meetings)
     },
