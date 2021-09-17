@@ -158,6 +158,7 @@ const meetingService = {
                 uuid: uuid
             }
         });
+        req = { ...req, startTime: new Date(req.startTime) }
         const meeting = await getMeetingWithHosts(uuid)
         if (meeting === null) return RestUtils.createResponse("Meeting with this uuid doesn't exist", 404)
         for (const host of await meeting.getHosts()) {
