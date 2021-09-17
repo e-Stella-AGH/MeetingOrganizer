@@ -70,6 +70,7 @@ const getMeetingWithHosts = async (uuid) => {
         },
         include: {
             model: Host,
+            model: Guest
         }
     })
 }
