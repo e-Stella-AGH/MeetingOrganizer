@@ -159,6 +159,7 @@ const meetingService = {
             }
         });
         const meeting = await getMeetingWithHosts(uuid)
+        if (meeting === null) return RestUtils.createResponse("Meeting with this uuid doesn't exist", 404)
         for (const host of await meeting.getHosts()) {
             const hostResponse = await HostService.getHostWithTimeSlots(host.uuid)
             hostResponse.host.TimeSlots.forEach(slot => TimeSlotsUtils.sliceSlots(slot, req))
