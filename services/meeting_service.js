@@ -133,7 +133,7 @@ const meetingService = {
     getMeetings: async (organizer) => {
         const meetings = await Meeting.findAll({
             where: {
-                "$organizer.id$": organizer.id
+                "OrganizerId": organizer.id
             },
             include: {
                 model: Organizer,

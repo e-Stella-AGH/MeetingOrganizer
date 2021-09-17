@@ -22,10 +22,18 @@ describe("Test the POST meeting", () => {
       })
 
     jest.doMock('../services/mail_service').default
-
-
   })
 
+
+  test("It should respond with list of 0 meetings", done => {
+    request(app).get("/meeting").set(header, jwt)
+      .send()
+      .then(response => {
+        expect(response.statusCode).toBe(200)
+        expect(response.body.msg.length).toBe(0)
+        done()
+      })
+  })
   test("It should respone that the meeting was added", done => {
     request(app).post("/meeting").set(header, jwt)
       .send(body)
