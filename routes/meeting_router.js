@@ -25,6 +25,7 @@ router.post('/', Authorize.authenticateToken, function (req, res) {
     .createMeeting(parsed.uuid, parsed.hosts, parsed.guest, parsed.duration, req.user)
     .then(result => res.status(result.status).send(result))
 });
+
 router.put('/:meeting_uuid', Authorize.authenticateToken, Authorize.isMeetingOrganizer, function (req, res) {
   const parsed = req.body
   MeetingService
@@ -33,8 +34,13 @@ router.put('/:meeting_uuid', Authorize.authenticateToken, Authorize.isMeetingOrg
 });
 router.delete('/:meeting_uuid', Authorize.authenticateToken, Authorize.isMeetingOrganizer, function (req, res, next) {
   const uuid = req.params.meeting_uuid
-  MeetingService.deleteMeeting(uuid).then(response => res.send({ msg: "Meeting deleted" }))
+  MeetingService.deleteMeeting(uuid).then(response => res.status(response.status).send(response))
 });
+
+router.post('/:meeting_uuid/ask_for_more_slots', function (req, res, next) {
+  const uuid = req.params.meeting_uuid
+  MeetingService.askForMoreTimeSlots(uuid).then(response => res.status(response.status).send(response))
+})
 
 
 module.exports = router;

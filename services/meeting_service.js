@@ -10,8 +10,8 @@ const { HostService } = require('../services/host_service')
 const { TimeSlotsUtils } = require('../utils/time_slots_utils')
 const { RestUtils } = require('../utils/rest_utils')
 const Organizer = models.Organizer
+const { MailService } = require('./mail_service')
 
-const BAD_REQUEST_CODE = 400
 Meeting.hosts = Meeting.belongsToMany(Host, { through: "MeetingHost" })
 Host.timeSlots = Host.hasMany(TimeSlot)
 
@@ -69,9 +69,32 @@ const getMeetingWithHosts = async (uuid) => {
             uuid: uuid
         },
         include: {
-            model: Host
+            model: Host,
         }
     })
+}
+
+
+
+const getIntersection = async (meeting) => {
+    let slots = []
+    for (const host of await meeting.getHosts()) {
+        slots.push((await HostService.getHostWithTimeSlots(host.uuid)).host.TimeSlots)
+    }
+    slots.forEach(s => s.sort((a, b) => a.startDatetime < b.startDatetime))
+    let intersections = TimeSlotsUtils.getIntersection(slots)
+    return TimeSlotsUtils.divideIntersectionOnDurationSlot(intersections, meeting.duration)
+}
+
+const sendMeetingEmail = async (meeting, organizer) => {
+    const intersection = await getIntersection(meeting)
+    const hosts = await meeting.getHosts()
+    if (intersection.length === 0) hosts.forEach(async host => {
+        const otherHosts = hosts.filter(otherHost => otherHost !== host).map(host => host.email)
+        await MailService.addMoreSlotsHosts(host, otherHosts, organizer.email)
+    })
+    const guest = await meeting.getGuest()
+    await MailService.pickSlotGuest(guest.email, meeting.uuid, organizer.email)
 }
 
 
@@ -79,27 +102,32 @@ const meetingService = {
 
     createMeeting: async (uuid, hostsMails, guestMail, duration, creator) => {
         const checkData = uuid === undefined ? Checker.checkData(hostsMails, guestMail, duration) : Checker.checkDataWithUUID(uuid, hostsMails, guestMail, duration)
-        if (checkData !== true) return createResponse(checkData, BAD_REQUEST_CODE)
+        if (checkData !== true) return createResponse(checkData, RestUtils.BAD_REQUEST_CODE)
         const data = uuid === undefined ? { duration: duration } : { uuid: uuid, duration: duration }
         const meeting = await Meeting.create(data)
         await addGuest(meeting, guestMail)
         await addHosts(meeting, hostsMails)
         await meeting.setOrganizer(creator)
+        await sendMeetingEmail(meeting, creator)
+
         return { ...createResponse("Meeting added", 201), uuid: meeting.uuid }
     },
 
 
     updateMeeting: async (meeting, hostsMails, guestMail, duration) => {
         const checkData = Checker.checkData(hostsMails, guestMail, duration)
-        if (checkData !== true) return createResponse(checkData, BAD_REQUEST_CODE)
-        if (meeting.startTime !== null) return createResponse("You can't update scheduled meeting", BAD_REQUEST_CODE)
+        if (checkData !== true) return createResponse(checkData, RestUtils.BAD_REQUEST_CODE)
+        if (meeting.startTime !== null) return createResponse("You can't update scheduled meeting", RestUtils.BAD_REQUEST_CODE)
         await updateMeetingHosts(meeting, hostsMails)
         await updateMeetingGuest(meeting, guestMail)
         await updateMeetingDuration(meeting, duration)
         return createResponse("Meeting updated")
     },
 
-    deleteMeeting: async (uuid) => await Meeting.destroy({ where: { uuid: uuid } }),
+    deleteMeeting: async (uuid) => {
+        await Meeting.destroy({ where: { uuid: uuid } })
+        return createResponse("Meeting deleted")
+    },
 
     getMeetings: async (organizer) => {
         const meetings = await Meeting.findAll({
@@ -124,12 +152,7 @@ const meetingService = {
     getTimeSlotsIntersection: async (uuid) => {
         const meeting = await getMeetingWithHosts(uuid)
         if (meeting == null) return RestUtils.createResponse("No meeting with such ID!", RestUtils.NOT_FOUND_CODE)
-        let slots = []
-        for (const host of await meeting.getHosts()) {
-            slots.push((await HostService.getHostWithTimeSlots(host.uuid)).host.TimeSlots)
-        }
-        slots.forEach(s => s.sort((a, b) => a.startDatetime < b.startDatetime))
-        const intersection = TimeSlotsUtils.getIntersection(slots)
+        const intersection = await getIntersection(meeting)
         return { ...RestUtils.createResponse("Available timeslots"), timeSlots: intersection }
     },
 
@@ -140,11 +163,17 @@ const meetingService = {
             }
         });
         const meeting = await getMeetingWithHosts(uuid)
-        for (const host of meeting.Hosts) {
+        for (const host of await meeting.getHosts()) {
             const hostResponse = await HostService.getHostWithTimeSlots(host.uuid)
             hostResponse.host.TimeSlots.forEach(slot => TimeSlotsUtils.sliceSlots(slot, req))
         }
         return RestUtils.createResponse("Meeting reserved")
+    },
+
+    askForMoreTimeSlots: async (uuid) => {
+        const meeting = getMeetingWithHosts(uuid)
+        await MailService.askForMoreSlots(meeting.guest, meeting.hosts)
+        return createResponse("Mails were sent")
     }
 
 

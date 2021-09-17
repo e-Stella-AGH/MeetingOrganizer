@@ -9,7 +9,6 @@ Host.timeSlots = Host.hasMany(TimeSlot);
 const hostService = {
     getHostWithTimeSlots: async (uuid) => {
         const host = await Host.findOne({
-            attributes: ['email'],
             where: {
                 uuid: uuid
             },
@@ -36,6 +35,13 @@ const hostService = {
             }
         })
         return RestUtils.createResponse("Host time slots updated")
+    },
+
+    hostExist: async (req, res, next) => {
+        const uuid = req.params.uuid
+        const countAll = await Host.findAndCountAll({ where: { uuid: uuid } })
+        if (countAll === 0) return res.status(404).send("User with this uuid not found")
+        next()
     }
 }
 

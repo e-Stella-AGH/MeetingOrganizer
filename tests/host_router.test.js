@@ -8,6 +8,7 @@ describe("Test the GET on host", () => {
 
     beforeAll(async () => {
         await sequelize.sync()
+        await Utils.fakeRegister()
         jwt = await Utils.registerAndLoginUser(bodyLogin)
         await request(app).post("/meeting").set(header, jwt)
             .send({ ...body, uuid: uuid })

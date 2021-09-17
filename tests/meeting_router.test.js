@@ -5,6 +5,7 @@ const app = require("../app");
 const { Utils } = require("./test_utils");
 
 
+jest.setTimeout(15_000);
 
 describe("Test the POST meeting", () => {
 
@@ -19,6 +20,10 @@ describe("Test the POST meeting", () => {
         jwt2 = result
         done()
       })
+
+    jest.doMock('../services/mail_service').default
+
+
   })
 
   test("It should respone that the meeting was added", done => {
@@ -116,6 +121,14 @@ describe("Test the POST meeting", () => {
       .then(response => {
         expect(response.statusCode).toBe(200)
         expect(response.body.msg.length).toBe(2)
+        done()
+      })
+  })
+  test("It should respond with unatuhorized", done => {
+    request(app).get("/meeting").set(header, "abcd")
+      .send()
+      .then(response => {
+        expect(response.statusCode).toBe(401)
         done()
       })
   })

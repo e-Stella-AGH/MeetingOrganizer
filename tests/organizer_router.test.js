@@ -13,12 +13,17 @@ let body = {
 
 const header = Utils.header
 
+jest.setTimeout(15_000);
+
 
 describe("Test the register user", () => {
 
 
-    beforeAll(async () => {
-        await sequelize.sync()
+    beforeAll((done) => {
+        sequelize.sync()
+            .then(_result => Utils.fakeRegister())
+            .then(_result => done())
+
     })
 
     test("It should register new user and with second try respond that email is already used", done => {
