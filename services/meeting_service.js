@@ -13,6 +13,7 @@ const Organizer = models.Organizer
 const { MailService } = require('./mail_service')
 
 Meeting.hosts = Meeting.belongsToMany(Host, { through: "MeetingHost" })
+Host.meetings = Host.belongsToMany(Meeting, { through: "MeetingHost" })
 Host.timeSlots = Host.hasMany(TimeSlot)
 
 Meeting.organizer = Meeting.belongsTo(Organizer, { through: "OrganizerMeeting" })
