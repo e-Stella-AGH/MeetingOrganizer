@@ -21,6 +21,7 @@ router.put('/:uuid/pick_time_slot', function (req, res, next) {
 
 router.post('/', Authorize.authenticateToken, function (req, res) {
   const parsed = req.body
+  console.log(parsed)
   MeetingService
     .createMeeting(parsed.uuid, parsed.hosts, parsed.guest, parsed.duration, req.user)
     .then(result => res.status(result.status).send(result))
