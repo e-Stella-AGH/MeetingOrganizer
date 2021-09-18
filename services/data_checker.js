@@ -5,7 +5,7 @@ const uuidRegex = /^([0-9a-fA-F]{8})-(([0-9a-fA-F]{4}\-){3})([0-9a-fA-F]{12})$/i
 
 const checkUUID = (uuid) => uuidRegex.test(uuid)
 
-const checkMail = (mail) => mail !== undefined && mail !== null ? mailRegex.test(mail.toLowerCase()) : false
+const checkMail = (mail) => mail && mailRegex.test(mail.toLowerCase())
 
 const Checker = {
 
