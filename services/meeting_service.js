@@ -76,6 +76,14 @@ const getMeetingWithHosts = async (uuid) => {
     })
 }
 
+const existMeeting = async (uuid) => {
+    return (await Meeting.findAndCountAll({
+        where: {
+            uuid: uuid
+        }
+    })) !== 0
+}
+
 
 
 const getIntersection = async (meeting) => {
@@ -103,6 +111,7 @@ const sendMeetingEmail = async (meeting, organizer) => {
 const meetingService = {
 
     createMeeting: async (uuid, hostsMails, guestMail, duration, creator) => {
+        if (uuid !== undefined && existMeeting(uuid)) return createResponse("Meeting with this uuid already exist", RestUtils.BAD_REQUEST_CODE)
         const checkData = uuid === undefined ? Checker.checkData(hostsMails, guestMail, duration) : Checker.checkDataWithUUID(uuid, hostsMails, guestMail, duration)
         if (checkData !== true) return createResponse(checkData, RestUtils.BAD_REQUEST_CODE)
         const data = uuid === undefined ? { duration: duration } : { uuid: uuid, duration: duration }
@@ -132,16 +141,21 @@ const meetingService = {
     },
 
     getMeetings: async (organizer) => {
-        const meetings = await Meeting.findAll({
+        let meetings = await Meeting.findAll({
             where: {
                 "OrganizerId": organizer.id
             },
             include: {
                 model: Organizer,
-                model: Host,
                 model: Guest
             }
         })
+        meetings = await Promise.all(meetings.map(async meeting => {
+            const hosts = await meeting.getHosts()
+            meeting.dataValues.hosts = hosts.map(host => host.email)
+            return meeting
+        }))
+
         return createResponse(meetings)
     },
 
