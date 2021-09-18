@@ -111,9 +111,10 @@ const sendMeetingEmail = async (meeting, organizer) => {
 const meetingService = {
 
     createMeeting: async (uuid, hostsMails, guestMail, duration, creator) => {
-        if (uuid !== undefined && existMeeting(uuid)) return createResponse("Meeting with this uuid already exist", RestUtils.BAD_REQUEST_CODE)
+        if (uuid !== undefined) return createResponse("You pass as uuid undefined", RestUtils.BAD_REQUEST_CODE)
+        if (existMeeting(uuid)) return createResponse("Meeting with this uuid already exist", RestUtils.BAD_REQUEST_CODE)
         const checkData = uuid === undefined ? Checker.checkData(hostsMails, guestMail, duration) : Checker.checkDataWithUUID(uuid, hostsMails, guestMail, duration)
-        if (checkData !== true) return createResponse(checkData, RestUtils.BAD_REQUEST_CODE)
+        if (!checkData) return createResponse(checkData, RestUtils.BAD_REQUEST_CODE)
         const data = uuid === undefined ? { duration: duration } : { uuid: uuid, duration: duration }
         const meeting = await Meeting.create(data)
         await addGuest(meeting, guestMail)
