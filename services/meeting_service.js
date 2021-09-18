@@ -152,7 +152,7 @@ const meetingService = {
         })
         meetings = await Promise.all(meetings.map(async meeting => {
             const hosts = await meeting.getHosts()
-            meeting.dataValues.hosts = hosts.map(host => host.email)
+            meeting.dataValues.Hosts = hosts.map(host => host.email)
             return meeting
         }))
 

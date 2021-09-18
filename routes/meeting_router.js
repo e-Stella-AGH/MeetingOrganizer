@@ -15,6 +15,7 @@ router.get('/:uuid', function (req, res, next) {
 router.put('/:uuid/pick_time_slot', function (req, res, next) {
   const uuid = req.params.uuid
   const parsed = req.body
+  console.log(parsed)
   MeetingService.pickTimeSlot(uuid, parsed)
     .then(result => res.status(result.status).send(result))
 });

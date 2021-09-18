@@ -25,8 +25,7 @@ const mailService = {
             content: `Hi,
                 Add more time slots for meeting with ${guest}, because there is no slot where all of you can attend. 
                 You can do this at this link: ${frontendUrl + "meeting/host/" + host.uuid}.
-                You can contact with other meeting participants: ${hosts.join(", ")}
-                `
+                ` + hosts.length !== 0 ? `You can contact with other meeting participants: ${hosts.join(", ")}` : ""
         })
     },
 
@@ -51,7 +50,7 @@ const mailService = {
             sender_email: organizer,
             sender_name: organizer,
             receiver: guest,
-            content: `Hi, could you pick timeslot for interview? You can do this at this link: ${frontendUrl + "meeting/job_seeker" + meetingUuid}`
+            content: `Hi, could you pick timeslot for interview? You can do this at this link: ${frontendUrl + "meeting/job_seeker/" + meetingUuid}`
         })
     }
 }
