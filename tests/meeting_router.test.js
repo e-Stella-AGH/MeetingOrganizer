@@ -232,20 +232,6 @@ describe("Test the PUT meeting", () => {
         done()
       })
   })
-
-  test("It should respond that the meeting has been reserved", done => {
-    request(app).put("/meeting/" + uuid + "/pick_time_slot")
-      .send(pickedTimeSlot)
-      .then(response => {
-        expect(response.statusCode).toBe(200)
-        expect(response.body.msg).toBe("Meeting reserved")
-        return db.models.Meeting.findByPk(uuid)
-      })
-      .then(meeting => {
-        expect(meeting.startTime.getTime()).toBe(pickedTimeSlot.startTime.getTime())
-        done()
-      })
-  })
 })
 
 describe("Test the DELETE meeting", () => {
@@ -320,11 +306,6 @@ let bodyLogin = {
 let bodyLogin2 = {
   "email": "meeting2@meeting2.pl",
   "password": "test"
-}
-
-const pickedTimeSlot = {
-  "startTime": new Date(2021, 5, 25, 14, 30),
-  "duration": 30
 }
 
 const BAD_REQUEST_CODE = 400

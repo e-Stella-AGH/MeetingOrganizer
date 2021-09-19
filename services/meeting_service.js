@@ -65,7 +65,7 @@ const addHosts = async (meeting, hostsMails) => {
 const updateMeetingDuration = async (meeting, duration) => { if (meeting.duration !== duration) await meeting.update({ duration: duration }, { where: { uuid: meeting.uuid } }) }
 
 const getMeetingWithHosts = async (uuid) => {
-    return Meeting.findOne({
+    return await Meeting.findOne({
         where: {
             uuid: uuid
         },
@@ -84,7 +84,10 @@ const existMeeting = async (uuid) => {
     })).count > 0
 }
 
-
+const intersectionNotExist = async (meeting, startTime) => await getIntersection(meeting)
+    .then(intersections => intersections
+        .filter(intersection => intersection.startDatetime.getTime() === startTime.getTime())
+        .length === 0)
 
 const getIntersection = async (meeting) => {
     let slots = []
@@ -166,18 +169,27 @@ const meetingService = {
         return { ...RestUtils.createResponse("Available timeslots"), timeSlots: intersection }
     },
 
-    pickTimeSlot: async (uuid, req) => {
-        await Meeting.update({ startTime: req.startTime }, {
+    pickTimeSlot: async (uuid, startTime, duration) => {
+        if (!startTime || !duration) return RestUtils.createResponse("StartTime or duration wasn't set", RestUtils.BAD_REQUEST_CODE)
+        const meeting = await getMeetingWithHosts(uuid)
+        if (meeting === null) return RestUtils.createResponse("Meeting with this uuid doesn't exist", RestUtils.NOT_FOUND_CODE)
+        if (meeting.startTime !== null)
+            return RestUtils.createResponse("Meeting date is already set", RestUtils.BAD_REQUEST_CODE)
+        startTime = new Date(startTime)
+        if (meeting.duration !== duration) return RestUtils.createResponse("Requested meeting duration is not proper", RestUtils.BAD_REQUEST_CODE)
+        if (await intersectionNotExist(meeting, startTime))
+            return RestUtils.createResponse("Requested meeting date is not proper", RestUtils.BAD_REQUEST_CODE)
+        await Meeting.update({ startTime: startTime }, {
             where: {
                 uuid: uuid
             }
         });
-        req = { ...req, startTime: new Date(req.startTime) }
-        const meeting = await getMeetingWithHosts(uuid)
-        if (meeting === null) return RestUtils.createResponse("Meeting with this uuid doesn't exist", 404)
         for (const host of await meeting.getHosts()) {
             const hostResponse = await HostService.getHostWithTimeSlots(host.uuid)
-            hostResponse.host.TimeSlots.forEach(slot => TimeSlotsUtils.sliceSlots(slot, req))
+            await Promise.all(
+                hostResponse.host.TimeSlots
+                    .map(async slot => await TimeSlotsUtils.sliceSlots(slot, { startTime, duration }, host.uuid))
+            )
         }
         return RestUtils.createResponse("Meeting reserved")
     },

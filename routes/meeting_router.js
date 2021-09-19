@@ -15,14 +15,12 @@ router.get('/:uuid', function (req, res, next) {
 router.put('/:uuid/pick_time_slot', function (req, res, next) {
   const uuid = req.params.uuid
   const parsed = req.body
-  console.log(parsed)
-  MeetingService.pickTimeSlot(uuid, parsed)
+  MeetingService.pickTimeSlot(uuid, parsed.startTime, parsed.duration)
     .then(result => res.status(result.status).send(result))
 });
 
 router.post('/', Authorize.authenticateToken, function (req, res) {
   const parsed = req.body
-  console.log(parsed)
   MeetingService
     .createMeeting(parsed.uuid, parsed.hosts, parsed.guest, parsed.duration, req.user)
     .then(result => res.status(result.status).send(result))
