@@ -30,7 +30,7 @@ describe("Tests for integration login", () => {
         request(app).post("/organizer/login_integration/").set(header, "abcadasd")
             .then(response => {
                 expect(response.status).toBe(401)
-                expect(response.text).toBe("Integration service response unauthorized")
+                expect(response.body.msg).toBe("Integration service response unauthorized")
                 done()
             })
     })

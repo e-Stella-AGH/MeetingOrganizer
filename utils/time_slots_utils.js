@@ -9,7 +9,8 @@ const addMinutesToDatetime = (datetime, minutes) => new Date(datetime.getTime() 
 const substractDatesInMinutes = (date1, date2) => Math.round(Math.abs(date1 - date2) / minToMsMult, 0)
 
 const slotIncludeInReservation = (slot, reservation) =>
-    reservation.startTime >= slot.startDatetime && reservation.duration <= slot.duration
+    reservation.startTime >= slot.startDatetime && addMinutesToDatetime(reservation.startTime,
+        reservation.duration) <= addMinutesToDatetime(slot.startDatetime, slot.duration)
 
 const TimeSlotsUtils = {
 

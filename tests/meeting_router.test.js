@@ -109,7 +109,7 @@ describe("Test the POST meeting", () => {
       .send({ ...body, uuid: uuid })
       .then(response => {
         expect(response.statusCode).toBe(401)
-        expect(response.text).toBe("Unauthorized")
+        expect(response.body.msg).toBe("Unauthorized")
         done()
       })
   })
@@ -118,7 +118,7 @@ describe("Test the POST meeting", () => {
       .send({ ...body, uuid: uuid })
       .then(response => {
         expect(response.statusCode).toBe(401)
-        expect(response.text).toBe("Unauthorized")
+        expect(response.body.msg).toBe("Unauthorized")
         done()
       })
   })
@@ -210,7 +210,7 @@ describe("Test the PUT meeting", () => {
       .send({ ...body, uuid: uuid })
       .then(response => {
         expect(response.statusCode).toBe(401)
-        expect(response.text).toBe("Unauthorized")
+        expect(response.body.msg).toBe("Unauthorized")
         done()
       })
   })
@@ -219,7 +219,7 @@ describe("Test the PUT meeting", () => {
       .send({ ...body, uuid: uuid })
       .then(response => {
         expect(response.statusCode).toBe(401)
-        expect(response.text).toBe("Unauthorized")
+        expect(response.body.msg).toBe("Unauthorized")
         done()
       })
   })
@@ -228,7 +228,7 @@ describe("Test the PUT meeting", () => {
       .send({ ...body, uuid: uuid })
       .then(response => {
         expect(response.statusCode).toBe(403)
-        expect(response.text).toBe("Forbidden")
+        expect(response.body.msg).toBe("Forbidden")
         done()
       })
   })
@@ -241,7 +241,7 @@ describe("Test the DELETE meeting", () => {
       .send({ ...body, uuid: uuid })
       .then(response => {
         expect(response.statusCode).toBe(401)
-        expect(response.text).toBe("Unauthorized")
+        expect(response.body.msg).toBe("Unauthorized")
         done()
       })
   })
@@ -250,7 +250,7 @@ describe("Test the DELETE meeting", () => {
       .send({ ...body, uuid: uuid })
       .then(response => {
         expect(response.statusCode).toBe(401)
-        expect(response.text).toBe("Unauthorized")
+        expect(response.body.msg).toBe("Unauthorized")
         done()
       })
   })
@@ -259,7 +259,7 @@ describe("Test the DELETE meeting", () => {
       .send({ ...body, uuid: uuid })
       .then(response => {
         expect(response.statusCode).toBe(403)
-        expect(response.text).toBe("Forbidden")
+        expect(response.body.msg).toBe("Forbidden")
         done()
       })
   })
@@ -276,7 +276,7 @@ describe("Test the DELETE meeting", () => {
     request(app).delete("/meeting/" + uuid).set(header, jwt)
       .then(response => {
         expect(response.statusCode).toBe(404)
-        expect(response.text).toBe("Not Found")
+        expect(response.body.msg).toBe("Not Found")
         done()
       })
   })

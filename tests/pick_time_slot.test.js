@@ -81,9 +81,9 @@ describe("Test pick_time_slot", () => {
                 return meeting.getHosts()
             }).then(async (hosts) => {
                 let hostResponse = await HostService.getHostWithTimeSlots(hosts[0].uuid)
-                expect(hostResponse.host.TimeSlots.map(slot => { return { startDatetime: slot.startDatetime, duration: slot.duration } })).toStrictEqual(endTimeSlots1)
+                expect(hostResponse.host.TimeSlots.map(slot => { return { startDatetime: slot.startDatetime, duration: slot.duration } })).toEqual(expect.arrayContaining(endTimeSlots1))
                 hostResponse = await HostService.getHostWithTimeSlots(hosts[1].uuid)
-                expect(hostResponse.host.TimeSlots.map(slot => { return { startDatetime: slot.startDatetime, duration: slot.duration } })).toStrictEqual(endTimeSlots2)
+                expect(hostResponse.host.TimeSlots.map(slot => { return { startDatetime: slot.startDatetime, duration: slot.duration } })).toEqual(expect.arrayContaining(endTimeSlots2))
                 done()
             })
     })
@@ -125,7 +125,11 @@ const timeSlots1 = [
     {
         startDatetime: new Date(2022, 5, 23, 11),
         duration: 120
-    }
+    },
+    {
+        startDatetime: new Date(2022, 5, 24, 11),
+        duration: 120
+    },
 ]
 const endTimeSlots1 = [
     {
@@ -135,12 +139,20 @@ const endTimeSlots1 = [
     {
         startDatetime: new Date(2022, 5, 23, 12, 30),
         duration: 30
-    }
+    },
+    {
+        startDatetime: new Date(2022, 5, 24, 11),
+        duration: 120
+    },
 ]
 
 const timeSlots2 = [
     {
         startDatetime: new Date(2022, 5, 23, 12),
+        duration: 120
+    },
+    {
+        startDatetime: new Date(2022, 5, 24, 12),
         duration: 120
     }
 ]
@@ -153,5 +165,9 @@ const endTimeSlots2 = [
     {
         startDatetime: new Date(2022, 5, 23, 12, 30),
         duration: 90
+    },
+    {
+        startDatetime: new Date(2022, 5, 24, 12),
+        duration: 120
     }
 ]
