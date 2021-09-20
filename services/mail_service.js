@@ -25,7 +25,8 @@ const mailService = {
             content: `Hi,
                 Add more time slots for meeting with ${guest}, because there is no slot where all of you can attend. 
                 You can do this at this link: ${frontendUrl + "meeting/host/" + host.uuid}.
-                ` + hosts.length !== 0 ? `You can contact with other meeting participants: ${hosts.join(", ")}` : ""
+                ${hosts.length !== 0 ? `You can contact with other meeting participants: ${hosts.join(", ")}` : ""}
+                `
         })
     },
 
