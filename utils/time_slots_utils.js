@@ -6,6 +6,12 @@ const minToMsMult = 60000
 
 const addMinutesToDatetime = (datetime, minutes) => new Date(datetime.getTime() + minutes * minToMsMult)
 
+const substractDatesInMinutes = (date1, date2) => Math.round(Math.abs(date1 - date2) / minToMsMult, 0)
+
+const slotIncludeInReservation = (slot, reservation) =>
+    reservation.startTime >= slot.startDatetime && addMinutesToDatetime(reservation.startTime,
+        reservation.duration) <= addMinutesToDatetime(slot.startDatetime, slot.duration)
+
 const TimeSlotsUtils = {
 
     divideIntersectionOnDurationSlot: function (intersections, duration) {
@@ -51,51 +57,23 @@ const TimeSlotsUtils = {
         return res
     },
 
-    sliceSlots: function (slot, reservation) {
-        if (slot.startDatetime >= reservation.startTime && slot.duration <= reservation.duration) {
-            return TimeSlot.destroy({ where: { id: slot.id } })
-        } else {
-            if (slot.startDatetime < reservation.startTime) {
-                let slotEndDate = slot.startDatetime.getTime() + slot.duration * minToMsMult
-                let meetingStartDate = reservation.startTime.getTime()
-                let meetingEndDate = reservation.startTime.getTime() + reservation.duration * minToMsMult
-
-                if (slotEndDate < meetingStartDate) {
-                    return null
-                }
-                if (slotEndDate > meetingEndDate) {
-                    let newDuration = (reservation.startTime.getTime() - slot.startDatetime.getTime()) / minToMsMult
-                    return TimeSlot.update({ duration: newDuration }, {
-                        where: {
-                            id: slot.id
-                        }
-                    })
-                } else {
-                    let newDuration = (reservation.startTime.getTime() - slot.startDatetime.getTime()) / minToMsMult
-                    return TimeSlot.update({ duration: newDuration }, {
-                        where: {
-                            id: slot.id
-                        }
-                    }).then(_ => {
-                        return TimeSlot.create({
-                            startDatetime: new Date(meetingEndDate),
-                            duration: (slotEndDate - meetingEndDate) / minToMsMult
-                        })
-                    })
-                }
-            } else {
-                let slotEndDate = slot.startDatetime.getTime() + slot.duration * minToMsMult
-                let meetingEndDate = reservation.startTime.getTime() + reservation.duration * minToMsMult
-                return TimeSlot.update({
-                    startDatetime: new Date(meetingEndDate),
-                    duration: (slotEndDate - meetingEndDate) / minToMsMult
-                }, {
-                    where: {
-                        id: slot.id
-                    }
-                })
-            }
-        }
+    sliceSlots: async function (slot, reservation, uuid) {
+        if (!slotIncludeInReservation(slot, reservation)) return [slot]
+        const result = []
+        let duration = substractDatesInMinutes(slot.startDatetime, reservation.startTime)
+        if (duration > 0) result.push(await TimeSlot.create({
+            startDatetime: slot.startDatetime, duration,
+            HostUuid: uuid
+        }))
+        const slotEnd = addMinutesToDatetime(slot.startDatetime, slot.duration)
+        const reservationEnd = addMinutesToDatetime(reservation.startTime, reservation.duration)
+        duration = substractDatesInMinutes(reservationEnd, slotEnd)
+        if (duration > 0) result.push(await TimeSlot.create({
+            startDatetime: reservationEnd, duration,
+            HostUuid: uuid
+        }))
+        await TimeSlot.destroy({ where: { id: slot.id } })
+        return result
     }
 }
 

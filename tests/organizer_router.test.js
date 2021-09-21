@@ -125,7 +125,7 @@ describe("Test the endpoints for logged in user", () => {
             .send({ ...body, password: passowrd })
             .then(response => {
                 expect(response.status).toBe(401)
-                expect(response.text).toBe("Unauthorized")
+                expect(response.body.msg).toBe("Unauthorized")
                 done()
             })
     })
@@ -135,7 +135,7 @@ describe("Test the endpoints for logged in user", () => {
             .send({ ...body, password: passowrd })
             .then(response => {
                 expect(response.status).toBe(401)
-                expect(response.text).toBe("Unauthorized")
+                expect(response.body.msg).toBe("Unauthorized")
                 done()
             })
     })

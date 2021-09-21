@@ -22,10 +22,18 @@ describe("Test the POST meeting", () => {
       })
 
     jest.doMock('../services/mail_service').default
-
-
   })
 
+
+  test("It should respond with list of 0 meetings", done => {
+    request(app).get("/meeting").set(header, jwt)
+      .send()
+      .then(response => {
+        expect(response.statusCode).toBe(200)
+        expect(response.body.msg.length).toBe(0)
+        done()
+      })
+  })
   test("It should respone that the meeting was added", done => {
     request(app).post("/meeting").set(header, jwt)
       .send(body)
@@ -101,7 +109,7 @@ describe("Test the POST meeting", () => {
       .send({ ...body, uuid: uuid })
       .then(response => {
         expect(response.statusCode).toBe(401)
-        expect(response.text).toBe("Unauthorized")
+        expect(response.body.msg).toBe("Unauthorized")
         done()
       })
   })
@@ -110,7 +118,7 @@ describe("Test the POST meeting", () => {
       .send({ ...body, uuid: uuid })
       .then(response => {
         expect(response.statusCode).toBe(401)
-        expect(response.text).toBe("Unauthorized")
+        expect(response.body.msg).toBe("Unauthorized")
         done()
       })
   })
@@ -202,7 +210,7 @@ describe("Test the PUT meeting", () => {
       .send({ ...body, uuid: uuid })
       .then(response => {
         expect(response.statusCode).toBe(401)
-        expect(response.text).toBe("Unauthorized")
+        expect(response.body.msg).toBe("Unauthorized")
         done()
       })
   })
@@ -211,7 +219,7 @@ describe("Test the PUT meeting", () => {
       .send({ ...body, uuid: uuid })
       .then(response => {
         expect(response.statusCode).toBe(401)
-        expect(response.text).toBe("Unauthorized")
+        expect(response.body.msg).toBe("Unauthorized")
         done()
       })
   })
@@ -220,21 +228,7 @@ describe("Test the PUT meeting", () => {
       .send({ ...body, uuid: uuid })
       .then(response => {
         expect(response.statusCode).toBe(403)
-        expect(response.text).toBe("Forbidden")
-        done()
-      })
-  })
-
-  test("It should respond that the meeting has been reserved", done => {
-    request(app).put("/meeting/" + uuid + "/pick_time_slot")
-      .send(pickedTimeSlot)
-      .then(response => {
-        expect(response.statusCode).toBe(200)
-        expect(response.body.msg).toBe("Meeting reserved")
-        return db.models.Meeting.findByPk(uuid)
-      })
-      .then(meeting => {
-        expect(meeting.startTime.getTime()).toBe(pickedTimeSlot.startTime.getTime())
+        expect(response.body.msg).toBe("Forbidden")
         done()
       })
   })
@@ -247,7 +241,7 @@ describe("Test the DELETE meeting", () => {
       .send({ ...body, uuid: uuid })
       .then(response => {
         expect(response.statusCode).toBe(401)
-        expect(response.text).toBe("Unauthorized")
+        expect(response.body.msg).toBe("Unauthorized")
         done()
       })
   })
@@ -256,7 +250,7 @@ describe("Test the DELETE meeting", () => {
       .send({ ...body, uuid: uuid })
       .then(response => {
         expect(response.statusCode).toBe(401)
-        expect(response.text).toBe("Unauthorized")
+        expect(response.body.msg).toBe("Unauthorized")
         done()
       })
   })
@@ -265,7 +259,7 @@ describe("Test the DELETE meeting", () => {
       .send({ ...body, uuid: uuid })
       .then(response => {
         expect(response.statusCode).toBe(403)
-        expect(response.text).toBe("Forbidden")
+        expect(response.body.msg).toBe("Forbidden")
         done()
       })
   })
@@ -282,7 +276,7 @@ describe("Test the DELETE meeting", () => {
     request(app).delete("/meeting/" + uuid).set(header, jwt)
       .then(response => {
         expect(response.statusCode).toBe(404)
-        expect(response.text).toBe("Not Found")
+        expect(response.body.msg).toBe("Not Found")
         done()
       })
   })
@@ -312,11 +306,6 @@ let bodyLogin = {
 let bodyLogin2 = {
   "email": "meeting2@meeting2.pl",
   "password": "test"
-}
-
-const pickedTimeSlot = {
-  "startTime": new Date(2021, 5, 25, 14, 30),
-  "duration": 30
 }
 
 const BAD_REQUEST_CODE = 400
