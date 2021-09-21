@@ -37,7 +37,7 @@ const mailService = {
             sender_name: guest,
             receiver: host.email,
             content: `Hi 
-                ${guest} asked for adding more time slots for meeting, because he can't attend on any from available slots.
+                ${guest.email} asked for adding more time slots for meeting, because he can't attend on any from available slots.
                 You can do this at this link: ${frontendUrl + "meeting/host/" + host.uuid}.
                 `
         }))

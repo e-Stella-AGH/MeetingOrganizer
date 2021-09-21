@@ -197,7 +197,8 @@ const meetingService = {
     askForMoreTimeSlots: async (uuid) => {
         const meeting = await getMeetingWithHosts(uuid)
         const hosts = await meeting.getHosts()
-        await MailService.askForMoreSlots(meeting.guest, hosts)
+        const guest = await meeting.getGuest()
+        await MailService.askForMoreSlots(guest, hosts)
         return createResponse("Mails were sent")
     }
 
