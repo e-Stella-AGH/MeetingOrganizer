@@ -95,7 +95,8 @@ const getIntersection = async (meeting) => {
         slots.push((await HostService.getHostWithTimeSlots(host.uuid)).host.TimeSlots)
     }
     slots.forEach(s => s.sort((a, b) => a.startDatetime < b.startDatetime))
-    let intersections = TimeSlotsUtils.getIntersection(slots)
+    const now = Date.now()
+    let intersections = TimeSlotsUtils.getIntersection(slots).filter(slot => slot.startDatetime > now)
     return TimeSlotsUtils.divideIntersectionOnDurationSlot(intersections, meeting.duration)
 }
 
