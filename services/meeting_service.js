@@ -103,11 +103,11 @@ const getIntersection = async (meeting) => {
 const sendMeetingEmail = async (meeting, organizer) => {
     const intersection = await getIntersection(meeting)
     const hosts = await meeting.getHosts()
+    const guest = await meeting.getGuest()
     if (intersection.length === 0) hosts.forEach(async host => {
         const otherHosts = hosts.filter(otherHost => otherHost !== host).map(host => host.email)
-        await MailService.addMoreSlotsHosts(host, otherHosts, organizer.email)
+        await MailService.addMoreSlotsHosts(host, otherHosts, organizer.email, guest.email)
     })
-    const guest = await meeting.getGuest()
     await MailService.pickSlotGuest(guest.email, meeting.uuid, organizer.email)
 }
 
