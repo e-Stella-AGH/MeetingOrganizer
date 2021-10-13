@@ -18,6 +18,7 @@ const hostService = {
     },
 
     updateHostsTimeSlots: async (uuid, timeSlots) => {
+        timeSlots = timeSlots.filter(timeSlot => new Date(timeSlot.startDatetime).getTime() > Date.now())
         if (timeSlots.some(slot => Checker.checkTimeSlot(slot) !== true)) {
             return RestUtils.createResponse(`Cannot set timeSlots in the past!`, RestUtils.BAD_REQUEST_CODE)
         }
