@@ -9,7 +9,7 @@ const amqp = require('amqplib/callback_api')
 const uuid = "ad18668e-4a28-4565-9f4a-4eace3068a62"
 const amqp_url = process.env.CLOUD_AMQP || "amqp://localhost:5672"
 
-const jestTimeout = 15_000
+const jestTimeout = 30_000
 jest.setTimeout(jestTimeout);
 
 
