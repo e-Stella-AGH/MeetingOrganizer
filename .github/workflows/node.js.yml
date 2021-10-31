@@ -12,6 +12,14 @@ on:
 jobs:
   build:
 
+    services:
+      rabbitmq:
+        image: rabbitmq
+        ports:
+          - 5672:5672
+
+    env:
+      CLOUDAMQP_URL: 'amqp://localhost:5672'
     runs-on: ubuntu-latest
 
     strategy:
