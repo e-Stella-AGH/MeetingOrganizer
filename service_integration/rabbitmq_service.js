@@ -7,7 +7,7 @@ const sendPickedMeetingDate = (meetingUUID, meetingDate, meetingLength) => {
         const queue = "interview"
         connection.createChannel(function (createChannelError, channel) {
             if (createChannelError) throw createChannelError
-            result = { meetingUUID, meetingDate, meetingLength }
+            result = { meetingUUID, meetingDate: meetingDate.getTime(), meetingLength }
             const msg = Buffer.from(JSON.stringify(result)).toString('base64')
             channel.sendToQueue(queue, Buffer.from(msg))
         })

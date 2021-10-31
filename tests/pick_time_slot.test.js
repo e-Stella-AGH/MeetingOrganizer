@@ -9,7 +9,7 @@ const amqp = require('amqplib/callback_api')
 const uuid = "ad18668e-4a28-4565-9f4a-4eace3068a62"
 const amqp_url = process.env.CLOUD_AMQP || "amqp://localhost:5672"
 
-const jestTimeout = 30_000
+const jestTimeout = 15_000
 jest.setTimeout(jestTimeout);
 
 
@@ -110,15 +110,16 @@ const consume = (doneCb) => {
             if (createChannelError) throw createChannelError
             const queue = "interview"
             channel.assertQueue(queue, {
-                durable: true
+                durable: true,
             })
             channel.consume(queue, msg => {
                 const message = Buffer.from(msg.content.toString(), 'base64')
+                channel.ack(msg)
                 const response = JSON.parse(message.toString())
                 expect(response.meetingUUID).toBe(uuid)
-                expect(Date.parse(response.meetingDate)).toBe(pickedTimeSlot.startTime)
+                const startTime = pickedTimeSlot.startTime.getTime()
+                expect(response.meetingDate).toBe(startTime)
                 expect(response.meetingLength).toBe(pickedTimeSlot.duration)
-                channel.ack(msg)
                 doneCb()
             })
         })
