@@ -89,6 +89,10 @@ describe("Test pick_time_slot", () => {
                 expect(hostResponse.host.TimeSlots.map(slot => { return { startDatetime: slot.startDatetime, duration: slot.duration } })).toEqual(expect.arrayContaining(endTimeSlots2))
                 consume(done)
             })
+            .catch(err => {
+                console.error(err)
+                done()
+            })
     })
     test("It should respond that the meeting date is already set", done => {
         request(app).put("/meeting/" + uuid + "/pick_time_slot")
@@ -114,7 +118,7 @@ const consume = (doneCb) => {
             })
             channel.consume(queue, msg => {
                 const message = Buffer.from(msg.content.toString(), 'base64')
-                channel.ack(msg)
+                channel.ack(message)
                 const response = JSON.parse(message.toString())
                 expect(response.meetingUUID).toBe(uuid)
                 const startTime = pickedTimeSlot.startTime.getTime()
@@ -125,6 +129,7 @@ const consume = (doneCb) => {
         })
         setTimeout(function () {
             connection.close();
+            process.exit(0);
         }, 500);
     })
 }

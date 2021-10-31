@@ -13,7 +13,7 @@ const sendPickedMeetingDate = (meetingUUID, meetingDate, meetingLength) => {
         })
         setTimeout(() => {
             connection.close()
-        }, 30_000)
+        }, 10_000)
     })
 }
 
