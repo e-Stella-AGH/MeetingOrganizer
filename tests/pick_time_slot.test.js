@@ -4,10 +4,13 @@ const { sequelize } = require("../db/sequelizer")
 const app = require("../app");
 const { Utils } = require("./test_utils")
 const { HostService } = require('../services/host_service')
+const amqp = require('amqplib/callback_api')
 
 const uuid = "ad18668e-4a28-4565-9f4a-4eace3068a62"
+const amqp_url = process.env.CLOUD_AMQP || "amqp://localhost:5672"
 
-jest.setTimeout(15_000);
+const jestTimeout = 30_000
+jest.setTimeout(jestTimeout);
 
 
 describe("Test pick_time_slot", () => {
@@ -84,7 +87,7 @@ describe("Test pick_time_slot", () => {
                 expect(hostResponse.host.TimeSlots.map(slot => { return { startDatetime: slot.startDatetime, duration: slot.duration } })).toEqual(expect.arrayContaining(endTimeSlots1))
                 hostResponse = await HostService.getHostWithTimeSlots(hosts[1].uuid)
                 expect(hostResponse.host.TimeSlots.map(slot => { return { startDatetime: slot.startDatetime, duration: slot.duration } })).toEqual(expect.arrayContaining(endTimeSlots2))
-                done()
+                consume(done)
             })
     })
     test("It should respond that the meeting date is already set", done => {
@@ -98,6 +101,32 @@ describe("Test pick_time_slot", () => {
     })
 
 })
+
+
+const consume = (doneCb) => {
+    amqp.connect(amqp_url, function (connectionError, connection) {
+        if (connectionError) throw connectionError
+        connection.createChannel(function (createChannelError, channel) {
+            if (createChannelError) throw createChannelError
+            const queue = "interview"
+            channel.assertQueue(queue, {
+                durable: true
+            })
+            channel.consume(queue, msg => {
+                const message = Buffer.from(msg.content.toString(), 'base64')
+                const response = JSON.parse(message.toString())
+                expect(response.meetingUUID).toBe(uuid)
+                expect(Date.parse(response.meetingDate)).toBe(pickedTimeSlot.startTime)
+                expect(response.meetingLength).toBe(pickedTimeSlot.duration)
+                channel.ack(msg)
+                doneCb()
+            })
+        })
+        setTimeout(function () {
+            connection.close();
+        }, 500);
+    })
+}
 
 
 const pickedTimeSlot = {
