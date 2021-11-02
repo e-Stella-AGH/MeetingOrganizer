@@ -11,6 +11,7 @@ const { TimeSlotsUtils } = require('../utils/time_slots_utils')
 const { RestUtils } = require('../utils/rest_utils')
 const Organizer = models.Organizer
 const { MailService } = require('./mail_service')
+const { RabbitService } = require('../service_integration/rabbitmq_service')
 
 Meeting.hosts = Meeting.belongsToMany(Host, { through: "MeetingHost" })
 Host.meetings = Host.belongsToMany(Meeting, { through: "MeetingHost" })
@@ -192,6 +193,7 @@ const meetingService = {
                     .map(async slot => await TimeSlotsUtils.sliceSlots(slot, { startTime, duration }, host.uuid))
             )
         }
+        RabbitService.sendPickedMeetingDate(uuid, startTime, duration)
         return RestUtils.createResponse("Meeting reserved")
     },
 
