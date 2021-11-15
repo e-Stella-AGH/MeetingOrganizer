@@ -1,4 +1,4 @@
-const amqp_url = process.env.CLOUD_AMQP || "amqp://localhost:5672"
+const amqp_url = process.env.CLOUDAMQP_URL || "amqp://localhost:5672"
 
 const sendPickedMeetingDate = (meetingUUID, meetingDate, meetingLength) => {
     const amqp = require('amqplib/callback_api')
