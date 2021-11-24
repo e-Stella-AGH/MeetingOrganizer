@@ -186,14 +186,15 @@ const meetingService = {
                 uuid: uuid
             }
         });
-        for (const host of await meeting.getHosts()) {
+        const hosts = await meeting.getHosts()
+        for (const host of hosts) {
             const hostResponse = await HostService.getHostWithTimeSlots(host.uuid)
             await Promise.all(
                 hostResponse.host.TimeSlots
                     .map(async slot => await TimeSlotsUtils.sliceSlots(slot, { startTime, duration }, host.uuid))
             )
         }
-        RabbitService.sendPickedMeetingDate(uuid, startTime, duration)
+        RabbitService.sendPickedMeetingDate(uuid, startTime, duration, hosts.map(host => host.email))
         return RestUtils.createResponse("Meeting reserved")
     },
 
